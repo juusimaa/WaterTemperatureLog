@@ -1,0 +1,52 @@
+@page "/add"
+@using WaterTemperatures.Data
+@using WaterTemperatures.Models
+@inject ITemperatureRepository Repository
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<PageTitle>Add a reading</PageTitle>
+
+<h1>Add a reading</h1>
+
+<EditForm Model="_model" OnValidSubmit="SaveAsync" FormName="addReading">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Temperature (°C)</label>
+        <InputNumber @bind-Value="_model.Celsius" class="form-control" step="0.1" />
+        <ValidationMessage For="() => _model.Celsius" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Measured at</label>
+        <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_measuredAtLocal" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Spot (optional)</label>
+        <InputText @bind-Value="_model.Spot" class="form-control" placeholder="e.g. by the bridge" />
+        <ValidationMessage For="() => _model.Spot" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Note (optional)</label>
+        <InputTextArea @bind-Value="_model.Note" class="form-control" rows="2" />
+        <ValidationMessage For="() => _model.Note" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" href="/">Cancel</a>
+</EditForm>
+
+@code {
+    private readonly TemperatureReading _model = new();
+    private DateTime _measuredAtLocal = DateTime.Now;
+
+    private async Task SaveAsync()
+    {
+        _model.MeasuredAt = new DateTimeOffset(_measuredAtLocal);
+        await Repository.AddAsync(_model);
+        Nav.NavigateTo("/");
+    }
+}
