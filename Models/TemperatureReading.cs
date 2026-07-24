@@ -10,8 +10,8 @@ public class TemperatureReading
     /// <summary>Unique id. Doubles as the Cosmos DB item id later.</summary>
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    /// <summary>When the measurement was taken (UTC).</summary>
-    public DateTimeOffset MeasuredAt { get; set; } = DateTimeOffset.UtcNow;
+    /// <summary>The day the measurement was taken (no time component).</summary>
+    public DateOnly MeasuredOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     /// <summary>Water temperature in degrees Celsius.</summary>
     [Range(-5, 40, ErrorMessage = "Temperature must be between -5 and 40 °C.")]

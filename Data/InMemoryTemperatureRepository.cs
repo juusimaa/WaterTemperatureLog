@@ -13,10 +13,10 @@ public class InMemoryTemperatureRepository : ITemperatureRepository
 
     public InMemoryTemperatureRepository()
     {
-        var now = DateTimeOffset.UtcNow;
-        Seed(new TemperatureReading { MeasuredAt = now.AddDays(-2), Celsius = 17.5, Spot = "By the bridge" });
-        Seed(new TemperatureReading { MeasuredAt = now.AddDays(-1), Celsius = 18.2, Spot = "By the bridge" });
-        Seed(new TemperatureReading { MeasuredAt = now.AddHours(-3), Celsius = 19.1, Spot = "Swimming pier", Note = "Sunny" });
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        Seed(new TemperatureReading { MeasuredOn = today.AddDays(-2), Celsius = 17.5, Spot = "By the bridge" });
+        Seed(new TemperatureReading { MeasuredOn = today.AddDays(-1), Celsius = 18.2, Spot = "By the bridge" });
+        Seed(new TemperatureReading { MeasuredOn = today, Celsius = 19.1, Spot = "Swimming pier", Note = "Sunny" });
     }
 
     private void Seed(TemperatureReading r) => _store[r.Id] = r;
@@ -30,7 +30,7 @@ public class InMemoryTemperatureRepository : ITemperatureRepository
     public Task<IReadOnlyList<TemperatureReading>> GetRecentAsync(int take = 100, CancellationToken ct = default)
     {
         IReadOnlyList<TemperatureReading> result = _store.Values
-            .OrderByDescending(r => r.MeasuredAt)
+            .OrderByDescending(r => r.MeasuredOn)
             .Take(take)
             .ToList();
         return Task.FromResult(result);

@@ -26,13 +26,13 @@ else
 {
     <p class="latest">
         Latest: <strong>@_readings[0].Celsius.ToString("0.0") °C</strong>
-        <span class="text-muted">(@_readings[0].MeasuredAt.LocalDateTime.ToString("g"))</span>
+        <span class="text-muted">(@_readings[0].MeasuredOn.ToString("d"))</span>
     </p>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Measured</th>
+                <th>Date</th>
                 <th class="text-end">°C</th>
                 <th>Spot</th>
                 <th>Note</th>
@@ -42,7 +42,7 @@ else
             @foreach (var r in _readings)
             {
                 <tr>
-                    <td>@r.MeasuredAt.LocalDateTime.ToString("g")</td>
+                    <td>@r.MeasuredOn.ToString("d")</td>
                     <td class="text-end">@r.Celsius.ToString("0.0")</td>
                     <td>@r.Spot</td>
                     <td>@r.Note</td>

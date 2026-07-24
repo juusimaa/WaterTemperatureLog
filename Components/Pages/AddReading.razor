@@ -20,8 +20,8 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Measured at</label>
-        <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_measuredAtLocal" class="form-control" />
+        <label class="form-label">Date</label>
+        <InputDate @bind-Value="_model.MeasuredOn" class="form-control" max="@_today" />
     </div>
 
     <div class="mb-3">
@@ -41,12 +41,12 @@
 </EditForm>
 
 @code {
+    // MeasuredOn defaults to today via the model initializer.
     private readonly TemperatureReading _model = new();
-    private DateTime _measuredAtLocal = DateTime.Now;
+    private readonly string _today = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
 
     private async Task SaveAsync()
     {
-        _model.MeasuredAt = new DateTimeOffset(_measuredAtLocal);
         await Repository.AddAsync(_model);
         Nav.NavigateTo("/");
     }
