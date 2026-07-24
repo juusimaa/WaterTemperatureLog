@@ -5,6 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <script>
+        // Follow the OS light/dark preference automatically (Bootstrap 5.3 color mode).
+        // Runs before paint to avoid a flash of the wrong theme.
+        window.applyColorMode = function () {
+            var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        };
+        window.applyColorMode();
+        window.matchMedia('(prefers-color-scheme: dark)')
+            .addEventListener('change', window.applyColorMode);
+    </script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
@@ -19,6 +30,12 @@
     <Routes />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        // Enhanced navigation/reload morphs the server HTML (which has no
+        // data-bs-theme) into the DOM and strips the attribute. Re-apply after
+        // each enhanced load so the theme survives reloads and navigations.
+        Blazor.addEventListener('enhancedload', window.applyColorMode);
+    </script>
 </body>
 
 </html>
