@@ -1,19 +1,92 @@
+/* ============================================================================
+   Colour theme — ported from the Grand Tours 2026 project (theme.css).
+   Light palette in :root; the dark palette overrides the same custom
+   properties in the prefers-color-scheme block. The app's App.razor script
+   keeps Bootstrap's data-bs-theme in sync with this same OS preference.
+   ============================================================================ */
+:root {
+    color-scheme: light dark;
+
+    --paper: #E9ECE4;         /* page background */
+    --paper-panel: #F4F6EF;   /* cards / panels */
+    --ink: #1E2A22;           /* primary text */
+    --ink-soft: #4C5A50;      /* secondary text */
+    --line: #C6CCBC;          /* borders / rules */
+    --shadow: 0 2px 10px rgba(30, 42, 34, 0.08);
+    --shadow-lift: 0 8px 26px rgba(30, 42, 34, 0.14);
+    --solid-bg: #1E2A22;
+    --solid-fg: #ffffff;
+
+    --gold: #C99A2E;
+    --gold-deep: #9C7620;
+    --red: #B23B32;
+    --green: #3E7A57;
+    --blue: #3B6485;
+    --olive: #7E8A46;
+
+    /* Map Bootstrap's theming onto the palette so buttons, links, tables and
+       form validation all follow the same colours. */
+    --bs-body-bg: var(--paper);
+    --bs-body-color: var(--ink);
+    --bs-border-color: var(--line);
+    --bs-link-color: var(--green);
+    --bs-link-color-rgb: 62, 122, 87;
+    --bs-link-hover-color: var(--gold-deep);
+    --bs-primary: var(--green);
+    --bs-primary-rgb: 62, 122, 87;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --paper: #12160F;
+        --paper-panel: #1B211A;
+        --ink: #E7ECDF;
+        --ink-soft: #9FA99A;
+        --line: #333B31;
+        --shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+        --shadow-lift: 0 10px 30px rgba(0, 0, 0, 0.55);
+        --solid-bg: #E7ECDF;
+        --solid-fg: #12160F;
+
+        --gold: #D8AC44;
+        --gold-deep: #E3BE63;
+        --red: #D3574C;
+        --blue: #77ABD2;
+        --green: #5AA179;
+
+        --bs-link-color-rgb: 90, 161, 121;
+        --bs-primary-rgb: 90, 161, 121;
+    }
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--paper);
+    color: var(--ink);
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: var(--green);
+}
+
+a:hover, .btn-link:hover {
+    color: var(--gold-deep);
 }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: var(--green);
+    border-color: var(--green);
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    color: #fff;
+    background-color: var(--gold-deep);
+    border-color: var(--gold-deep);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem var(--paper), 0 0 0 0.25rem var(--gold);
 }
 
 .content {
@@ -25,15 +98,15 @@ h1:focus {
 }
 
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    outline: 1px solid var(--green);
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+    outline: 1px solid var(--red);
 }
 
 .validation-message {
-    color: #e50000;
+    color: var(--red);
 }
 
 .blazor-error-boundary {
