@@ -38,29 +38,31 @@ else if (_view == View.List)
         <span class="text-muted">(@_latest.MeasuredOn.ToString("d"))</span>
     </p>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th class="text-end">°C</th>
-                <th>Spot</th>
-                <th>Note</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
-            {
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@r.MeasuredOn.ToString("d")</td>
-                    <td class="text-end">@r.Celsius.ToString("0.0")</td>
-                    <td>@r.Spot</td>
-                    <td>@r.Note</td>
-                    <td class="text-end"><a href="@($"/edit/{r.Id}")">Edit</a></td>
+                    <th>Date</th>
+                    <th class="text-end">°C</th>
+                    <th>Spot</th>
+                    <th>Note</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
+                {
+                    <tr>
+                        <td class="text-nowrap">@r.MeasuredOn.ToString("d")</td>
+                        <td class="text-end">@r.Celsius.ToString("0.0")</td>
+                        <td>@r.Spot</td>
+                        <td>@r.Note</td>
+                        <td class="text-end"><a href="@($"/edit/{r.Id}")">Edit</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 else
 {
