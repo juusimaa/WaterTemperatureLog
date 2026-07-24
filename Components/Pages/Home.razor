@@ -1,13 +1,14 @@
 @page "/"
 @using WaterTemperatures.Data
 @using WaterTemperatures.Models
+@using WaterTemperatures.Resources
 @inject ITemperatureRepository Repository
 @rendermode InteractiveServer
 
-<PageTitle>Water temperatures — Torniojoki, Järhöinen</PageTitle>
+<PageTitle>@AppText.AppName</PageTitle>
 
-<h1>Water temperatures</h1>
-<p class="lead">Torniojoki river at Järhöinen village.</p>
+<h1>@AppText.AppName</h1>
+<p class="lead">@AppText.Subtitle</p>
 
 <p>
     <a class="btn btn-primary" href="/add">+ Add a reading</a>

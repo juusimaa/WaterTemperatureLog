@@ -1,11 +1,12 @@
 @page "/add"
 @using WaterTemperatures.Data
 @using WaterTemperatures.Models
+@using WaterTemperatures.Resources
 @inject ITemperatureRepository Repository
 @inject NavigationManager Nav
 @rendermode InteractiveServer
 
-<PageTitle>Add a reading</PageTitle>
+<PageTitle>Add a reading — @AppText.AppName</PageTitle>
 
 <h1>Add a reading</h1>
 

@@ -1,7 +1,10 @@
-# Water Temperatures — Torniojoki, Järhöinen
+# Water Temperature Log — Torniojoki, Jarhoinen
 
 Blazor Web App (.NET 10) to add and view water-temperature readings from the
-Torniojoki river at Järhöinen village.
+Torniojoki river at Jarhoinen village.
+
+User-facing text and location names live in `Resources/AppText.cs`. Finnish/English
+localization is planned — see that file for the migration path to `.resx` resources.
 
 ## Stack
 

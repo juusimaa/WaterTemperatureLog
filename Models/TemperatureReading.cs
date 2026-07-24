@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace WaterTemperatures.Models;
 
 /// <summary>
-/// A single water-temperature measurement from Torniojoki at Järhöinen.
+/// A single water-temperature measurement from Torniojoki at Jarhoinen.
 /// </summary>
 public class TemperatureReading
 {
