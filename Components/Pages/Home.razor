@@ -36,6 +36,7 @@ else
                 <th class="text-end">°C</th>
                 <th>Spot</th>
                 <th>Note</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +47,7 @@ else
                     <td class="text-end">@r.Celsius.ToString("0.0")</td>
                     <td>@r.Spot</td>
                     <td>@r.Note</td>
+                    <td class="text-end"><a href="@($"/edit/{r.Id}")">Edit</a></td>
                 </tr>
             }
         </tbody>

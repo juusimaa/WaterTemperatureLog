@@ -1,7 +1,4 @@
 @page "/add"
-@using WaterTemperatures.Data
-@using WaterTemperatures.Models
-@using WaterTemperatures.Resources
 @inject ITemperatureRepository Repository
 @inject NavigationManager Nav
 @rendermode InteractiveServer
@@ -10,40 +7,11 @@
 
 <h1>Add a reading</h1>
 
-<EditForm Model="_model" OnValidSubmit="SaveAsync" FormName="addReading">
-    <DataAnnotationsValidator />
-
-    <div class="mb-3">
-        <label class="form-label">Temperature (°C)</label>
-        <InputNumber @bind-Value="_model.Celsius" class="form-control" step="0.1" />
-        <ValidationMessage For="() => _model.Celsius" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Date</label>
-        <InputDate @bind-Value="_model.MeasuredOn" class="form-control" max="@_today" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Spot (optional)</label>
-        <InputText @bind-Value="_model.Spot" class="form-control" placeholder="e.g. by the bridge" />
-        <ValidationMessage For="() => _model.Spot" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Note (optional)</label>
-        <InputTextArea @bind-Value="_model.Note" class="form-control" rows="2" />
-        <ValidationMessage For="() => _model.Note" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a class="btn btn-secondary" href="/">Cancel</a>
-</EditForm>
+<ReadingForm Model="_model" SubmitLabel="Save" OnValidSubmit="SaveAsync" />
 
 @code {
     // MeasuredOn defaults to today via the model initializer.
     private readonly TemperatureReading _model = new();
-    private readonly string _today = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
 
     private async Task SaveAsync()
     {

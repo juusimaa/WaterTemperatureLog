@@ -27,6 +27,24 @@ public class InMemoryTemperatureRepository : ITemperatureRepository
         return Task.CompletedTask;
     }
 
+    public Task<TemperatureReading?> GetByIdAsync(string id, CancellationToken ct = default)
+    {
+        _store.TryGetValue(id, out var reading);
+        return Task.FromResult(reading);
+    }
+
+    public Task UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
+    {
+        _store[reading.Id] = reading;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(string id, CancellationToken ct = default)
+    {
+        _store.TryRemove(id, out _);
+        return Task.CompletedTask;
+    }
+
     public Task<IReadOnlyList<TemperatureReading>> GetRecentAsync(int take = 100, CancellationToken ct = default)
     {
         IReadOnlyList<TemperatureReading> result = _store.Values

@@ -1,0 +1,53 @@
+@using WaterTemperatures.Models
+
+@* Shared add/edit form for a temperature reading. The parent owns persistence
+   and navigation; this component only renders fields, validates, and raises
+   OnValidSubmit. *@
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" FormName="readingForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Temperature (°C)</label>
+        <InputNumber @bind-Value="Model.Celsius" class="form-control" step="0.1" />
+        <ValidationMessage For="() => Model.Celsius" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        <InputDate @bind-Value="Model.MeasuredOn" class="form-control" max="@_today" />
+        <ValidationMessage For="() => Model.MeasuredOn" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Spot (optional)</label>
+        <InputText @bind-Value="Model.Spot" class="form-control" placeholder="e.g. by the bridge" />
+        <ValidationMessage For="() => Model.Spot" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Note (optional)</label>
+        <InputTextArea @bind-Value="Model.Note" class="form-control" rows="2" />
+        <ValidationMessage For="() => Model.Note" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">@SubmitLabel</button>
+    <a class="btn btn-secondary" href="/">Cancel</a>
+    @ExtraButtons
+</EditForm>
+
+@code {
+    /// <summary>The reading being added or edited. Bound directly by the fields.</summary>
+    [Parameter, EditorRequired] public TemperatureReading Model { get; set; } = default!;
+
+    /// <summary>Text on the primary submit button, e.g. "Save" or "Update".</summary>
+    [Parameter] public string SubmitLabel { get; set; } = "Save";
+
+    /// <summary>Raised when the form passes validation.</summary>
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    /// <summary>Optional extra buttons (e.g. Delete) rendered after Cancel.</summary>
+    [Parameter] public RenderFragment? ExtraButtons { get; set; }
+
+    private readonly string _today = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
+}

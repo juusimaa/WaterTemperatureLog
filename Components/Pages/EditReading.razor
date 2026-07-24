@@ -1,0 +1,53 @@
+@page "/edit/{id}"
+@inject ITemperatureRepository Repository
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<PageTitle>Edit reading — @AppText.AppName</PageTitle>
+
+<h1>Edit reading</h1>
+
+@if (_loading)
+{
+    <p><em>Loading…</em></p>
+}
+else if (_model is null)
+{
+    <div class="alert alert-warning">Reading not found.</div>
+    <a class="btn btn-secondary" href="/">Back</a>
+}
+else
+{
+    <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync">
+        <ExtraButtons>
+            <button type="button" class="btn btn-outline-danger float-end" @onclick="DeleteAsync">
+                Delete
+            </button>
+        </ExtraButtons>
+    </ReadingForm>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = default!;
+
+    private TemperatureReading? _model;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model = await Repository.GetByIdAsync(Id);
+        _loading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        await Repository.UpdateAsync(_model!);
+        Nav.NavigateTo("/");
+    }
+
+    private async Task DeleteAsync()
+    {
+        await Repository.DeleteAsync(Id);
+        Nav.NavigateTo("/");
+    }
+}
