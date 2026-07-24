@@ -1,18 +1,27 @@
 @page "/"
-@using WaterTemperatures.Data
-@using WaterTemperatures.Models
-@using WaterTemperatures.Resources
 @inject ITemperatureRepository Repository
 @rendermode InteractiveServer
 
 <PageTitle>@AppText.AppName</PageTitle>
 
-<h1>@AppText.AppName</h1>
-<p class="lead">@AppText.Subtitle</p>
+<h1 class="visually-hidden">@AppText.AppName</h1>
 
-<p>
-    <a class="btn btn-primary" href="/add">+ Add a reading</a>
-</p>
+<div class="toolbar">
+    <a class="btn btn-primary" href="/add">+ Add measurement</a>
+
+    <div class="btn-group view-toggle" role="group" aria-label="View toggle">
+        <button type="button"
+                class="btn @(_view == View.List ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => _view = View.List">
+            List
+        </button>
+        <button type="button"
+                class="btn @(_view == View.Graph ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => _view = View.Graph">
+            Graph
+        </button>
+    </div>
+</div>
 
 @if (_readings is null)
 {
@@ -22,11 +31,11 @@ else if (_readings.Count == 0)
 {
     <p>No readings yet. Be the first to <a href="/add">add one</a>.</p>
 }
-else
+else if (_view == View.List)
 {
     <p class="latest">
-        Latest: <strong>@_readings[0].Celsius.ToString("0.0") °C</strong>
-        <span class="text-muted">(@_readings[0].MeasuredOn.ToString("d"))</span>
+        Latest: <strong>@_latest.Celsius.ToString("0.0") °C</strong>
+        <span class="text-muted">(@_latest.MeasuredOn.ToString("d"))</span>
     </p>
 
     <table class="table">
@@ -40,7 +49,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var r in _readings)
+            @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
             {
                 <tr>
                     <td>@r.MeasuredOn.ToString("d")</td>
@@ -53,12 +62,39 @@ else
         </tbody>
     </table>
 }
+else
+{
+    <ApexChart TItem="TemperatureReading"
+               Title="Water temperature (°C)"
+               Options="_options">
+        <ApexPointSeries TItem="TemperatureReading"
+                         Items="_chartOrder"
+                         Name="Temperature"
+                         SeriesType="SeriesType.Line"
+                         XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
+                         YValue="@(r => (decimal)r.Celsius)" />
+    </ApexChart>
+}
 
 @code {
+    private enum View { List, Graph }
+
+    private View _view = View.List;
     private IReadOnlyList<TemperatureReading>? _readings;
+
+    // Latest reading (list header) and chart order (oldest-first, left to right).
+    private TemperatureReading _latest => _readings!.OrderByDescending(r => r.MeasuredOn).First();
+    private List<TemperatureReading> _chartOrder => _readings!.OrderBy(r => r.MeasuredOn).ToList();
+
+    private readonly ApexChartOptions<TemperatureReading> _options = new()
+    {
+        Xaxis = new XAxis { Type = XAxisType.Datetime },
+        Markers = new Markers { Size = 4 },
+        Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
+    };
 
     protected override async Task OnInitializedAsync()
     {
-        _readings = await Repository.GetRecentAsync();
+        _readings = await Repository.GetRecentAsync(1000);
     }
 }
