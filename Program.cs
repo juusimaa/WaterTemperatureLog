@@ -1,3 +1,4 @@
+using ApexCharts;
 using WaterTemperatures.Components;
 using WaterTemperatures.Data;
 
@@ -9,6 +10,9 @@ builder.Services.AddRazorComponents()
 
 // Storage: in-memory for local dev. Swap to a Cosmos DB implementation for production.
 builder.Services.AddSingleton<ITemperatureRepository, InMemoryTemperatureRepository>();
+
+// Charting (Blazor-ApexCharts).
+builder.Services.AddApexCharts();
 
 var app = builder.Build();
 
