@@ -11,15 +11,12 @@ public class TemperatureReading
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>The day the measurement was taken (no time component).</summary>
+    [NotInFuture(ErrorMessage = "Date cannot be in the future.")]
     public DateOnly MeasuredOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     /// <summary>Water temperature in degrees Celsius.</summary>
-    [Range(-5, 40, ErrorMessage = "Temperature must be between -5 and 40 °C.")]
+    [Range(0, 40, ErrorMessage = "Temperature must be between 0 and 40 °C.")]
     public double Celsius { get; set; }
-
-    /// <summary>Free-text location detail, e.g. "by the bridge". Optional.</summary>
-    [MaxLength(120)]
-    public string? Spot { get; set; }
 
     /// <summary>Optional note (weather, who measured, etc.).</summary>
     [MaxLength(500)]

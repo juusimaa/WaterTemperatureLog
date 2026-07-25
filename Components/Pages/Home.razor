@@ -44,7 +44,6 @@ else if (_view == View.List)
                 <tr>
                     <th>Date</th>
                     <th class="text-end">°C</th>
-                    <th>Spot</th>
                     <th>Note</th>
                     <th></th>
                 </tr>
@@ -55,7 +54,6 @@ else if (_view == View.List)
                     <tr>
                         <td class="text-nowrap">@r.MeasuredOn.ToString("d")</td>
                         <td class="text-end">@r.Celsius.ToString("0.0")</td>
-                        <td>@r.Spot</td>
                         <td>@r.Note</td>
                         <td class="text-end"><a href="@($"/edit/{r.Id}")">Edit</a></td>
                     </tr>

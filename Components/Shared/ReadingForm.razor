@@ -9,7 +9,7 @@
 
     <div class="mb-3">
         <label class="form-label">Temperature (°C)</label>
-        <InputNumber @bind-Value="Model.Celsius" class="form-control" step="0.1" />
+        <InputNumber @bind-Value="Model.Celsius" class="form-control" step="0.1" min="0" max="40" />
         <ValidationMessage For="() => Model.Celsius" />
     </div>
 
@@ -17,12 +17,6 @@
         <label class="form-label">Date</label>
         <InputDate @bind-Value="Model.MeasuredOn" class="form-control" max="@_today" />
         <ValidationMessage For="() => Model.MeasuredOn" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Spot (optional)</label>
-        <InputText @bind-Value="Model.Spot" class="form-control" placeholder="e.g. by the bridge" />
-        <ValidationMessage For="() => Model.Spot" />
     </div>
 
     <div class="mb-3">
