@@ -133,6 +133,8 @@ else
 
     private readonly ApexChartOptions<TemperatureReading> _options = new()
     {
+        // Deep green (--green-deep) to match the header and button accents.
+        Colors = ["#234A34"],
         Xaxis = new XAxis { Type = XAxisType.Datetime },
         Markers = new Markers { Size = 4 },
         Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },

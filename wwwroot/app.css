@@ -21,6 +21,7 @@
     --gold-deep: #9C7620;
     --red: #B23B32;
     --green: #3E7A57;
+    --green-deep: #234A34;
     --blue: #3B6485;
     --olive: #7E8A46;
 
@@ -32,8 +33,8 @@
     --bs-link-color: var(--green);
     --bs-link-color-rgb: 62, 122, 87;
     --bs-link-hover-color: var(--gold-deep);
-    --bs-primary: var(--green);
-    --bs-primary-rgb: 62, 122, 87;
+    --bs-primary: var(--green-deep);
+    --bs-primary-rgb: 35, 74, 52;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,9 +54,10 @@
         --red: #D3574C;
         --blue: #77ABD2;
         --green: #5AA179;
+        --green-deep: #3E7A57;
 
         --bs-link-color-rgb: 90, 161, 121;
-        --bs-primary-rgb: 90, 161, 121;
+        --bs-primary-rgb: 62, 122, 87;
     }
 }
 
