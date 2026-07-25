@@ -87,6 +87,18 @@ a:hover, .btn-link:hover {
     border-color: var(--gold-deep);
 }
 
+.btn-outline-primary {
+    color: var(--green-deep);
+    background-color: transparent;
+    border-color: var(--green-deep);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+    color: #fff;
+    background-color: var(--green-deep);
+    border-color: var(--green-deep);
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem var(--paper), 0 0 0 0.25rem var(--gold);
 }
