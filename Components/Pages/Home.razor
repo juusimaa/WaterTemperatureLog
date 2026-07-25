@@ -33,10 +33,23 @@ else if (_readings.Count == 0)
 }
 else if (_view == View.List)
 {
-    <p class="latest">
-        Latest: <strong>@_latest.Celsius.ToString("0.0") °C</strong>
-        <span class="text-muted">(@_latest.MeasuredOn.ToString("d"))</span>
-    </p>
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-label">Latest</span>
+            <strong>@_latest.Celsius.ToString("0.0") °C</strong>
+            <span class="text-muted">@_latest.MeasuredOn.ToString("d")</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">All-time high</span>
+            <strong>@_allTimeMax.Celsius.ToString("0.0") °C</strong>
+            <span class="text-muted">@_allTimeMax.MeasuredOn.ToString("d")</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">All-time low</span>
+            <strong>@_allTimeMin.Celsius.ToString("0.0") °C</strong>
+            <span class="text-muted">@_allTimeMin.MeasuredOn.ToString("d")</span>
+        </div>
+    </div>
 
     <div class="table-responsive">
         <table class="table">
@@ -67,7 +80,7 @@ else
     <div class="graph-filter">
         <button type="button"
                 class="btn @(_selectedYear is null ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => _selectedYear = null">
+                @onclick="() => SelectYear(null)">
             All years
         </button>
 
@@ -99,6 +112,7 @@ else
                              Items="_chartOrder"
                              Name="Temperature"
                              SeriesType="SeriesType.Line"
+                             ShowDataLabels="true"
                              XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
                              YValue="@(r => (decimal)r.Celsius)" />
         </ApexChart>
@@ -114,8 +128,10 @@ else
     // Graph year filter. null = show every year.
     private int? _selectedYear;
 
-    // Latest reading (list header).
+    // Latest reading and all-time extremes (list header).
     private TemperatureReading _latest => _readings!.OrderByDescending(r => r.MeasuredOn).First();
+    private TemperatureReading _allTimeMax => _readings!.OrderByDescending(r => r.Celsius).ThenBy(r => r.MeasuredOn).First();
+    private TemperatureReading _allTimeMin => _readings!.OrderBy(r => r.Celsius).ThenBy(r => r.MeasuredOn).First();
 
     // Years present in the data, newest first, for the filter dropdown.
     private IReadOnlyList<int> _years =>
@@ -142,11 +158,61 @@ else
 
     private void OnYearChanged(ChangeEventArgs e)
     {
-        _selectedYear = int.TryParse(e.Value?.ToString(), out var year) ? year : null;
+        SelectYear(int.TryParse(e.Value?.ToString(), out var year) ? year : null);
+    }
+
+    private void SelectYear(int? year)
+    {
+        _selectedYear = year;
+        UpdateExtremeMarkers();
+    }
+
+    // Highlight the hottest and coldest points of the currently displayed data
+    // with larger, coloured markers (red = high, blue = low) and always-on labels.
+    private void UpdateExtremeMarkers()
+    {
+        var order = _chartOrder;
+        if (order.Count == 0)
+        {
+            _options.Markers!.Discrete = null;
+            _options.DataLabels = new DataLabels { Enabled = false };
+            return;
+        }
+
+        int maxIdx = 0, minIdx = 0;
+        for (var i = 1; i < order.Count; i++)
+        {
+            if (order[i].Celsius > order[maxIdx].Celsius) maxIdx = i;
+            if (order[i].Celsius < order[minIdx].Celsius) minIdx = i;
+        }
+
+        var markers = new List<MarkersDiscrete>
+        {
+            new() { SeriesIndex = 0, DataPointIndex = maxIdx, FillColor = "#B23B32", StrokeColor = "#ffffff", Size = 7 },
+        };
+        if (minIdx != maxIdx)
+        {
+            markers.Add(new() { SeriesIndex = 0, DataPointIndex = minIdx, FillColor = "#3B6485", StrokeColor = "#ffffff", Size = 7 });
+        }
+
+        _options.Markers!.Discrete = markers;
+
+        // Show a permanent value label on the min/max points only; every other
+        // point returns an empty string, which ApexCharts skips (no stray pill).
+        // A filled background pill keeps the white text readable in light or dark.
+        _options.DataLabels = new DataLabels
+        {
+            Enabled = true,
+            OffsetY = -10,
+            Style = new DataLabelsStyle { FontSize = "12px", FontWeight = "700" },
+            Background = new DataLabelsBackground { Enabled = true, ForeColor = "#ffffff", BorderWidth = 0 },
+            Formatter = $"function(val, opts) {{ return (opts.dataPointIndex === {maxIdx} || opts.dataPointIndex === {minIdx}) ? val + '°C' : ''; }}",
+        };
     }
 
     protected override async Task OnInitializedAsync()
     {
         _readings = await Repository.GetRecentAsync(1000);
+        UpdateExtremeMarkers();
     }
 }

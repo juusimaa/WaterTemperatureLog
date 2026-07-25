@@ -32,7 +32,7 @@
     --bs-border-color: var(--line);
     --bs-link-color: var(--green);
     --bs-link-color-rgb: 62, 122, 87;
-    --bs-link-hover-color: var(--gold-deep);
+    --bs-link-hover-color: var(--green-deep);
     --bs-primary: var(--green-deep);
     --bs-primary-rgb: 35, 74, 52;
 }
@@ -72,7 +72,7 @@ a, .btn-link {
 }
 
 a:hover, .btn-link:hover {
-    color: var(--gold-deep);
+    color: var(--green-deep);
 }
 
 .btn-primary {
@@ -83,8 +83,8 @@ a:hover, .btn-link:hover {
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
     color: #fff;
-    background-color: var(--gold-deep);
-    border-color: var(--gold-deep);
+    background-color: var(--green-deep);
+    border-color: var(--green-deep);
 }
 
 .btn-outline-primary {
@@ -100,7 +100,7 @@ a:hover, .btn-link:hover {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem var(--paper), 0 0 0 0.25rem var(--gold);
+  box-shadow: 0 0 0 0.1rem var(--paper), 0 0 0 0.25rem var(--green);
 }
 
 .content {
