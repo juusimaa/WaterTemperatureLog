@@ -79,35 +79,51 @@ else
 {
     <div class="graph-filter">
         <button type="button"
-                class="btn @(_selectedYear is null ? "btn-primary" : "btn-outline-primary")"
+                class="btn @(!_stacked && _selectedYear is null ? "btn-primary" : "btn-outline-primary")"
                 @onclick="() => SelectYear(null)">
             All years
+        </button>
+
+        <button type="button"
+                class="btn @(_stacked ? "btn-primary" : "btn-outline-primary")"
+                @onclick="ShowStacked">
+            Compare years
         </button>
 
         <label class="year-select">
             <span class="visually-hidden">Filter by year</span>
             <select class="form-select"
-                    value="@(_selectedYear?.ToString() ?? "")"
+                    value="@(!_stacked && _selectedYear is not null ? _selectedYear.ToString() : "")"
                     @onchange="OnYearChanged">
                 <option value="">Select a year…</option>
                 @foreach (var year in _years)
                 {
-                    <option value="@year" selected="@(_selectedYear == year)">@year</option>
+                    <option value="@year" selected="@(!_stacked && _selectedYear == year)">@year</option>
                 }
             </select>
         </label>
     </div>
 
-    @if (_chartOrder.Count == 0)
-    {
-        <p><em>No readings for @_selectedYear.</em></p>
-    }
-    else
-    {
-        <ApexChart @key="_selectedYear"
-                   TItem="TemperatureReading"
-                   Title="@_chartTitle"
-                   Options="_options">
+    <ApexChart @key="_chartKey"
+               TItem="TemperatureReading"
+               Title="@_chartTitle"
+               Options="_options">
+        @if (_stacked)
+        {
+            @* One line per year, all overlaid on a shared month axis (mapped to a
+               common reference year) so seasons line up for comparison. *@
+            @foreach (var g in _yearGroups)
+            {
+                <ApexPointSeries TItem="TemperatureReading"
+                                 Items="g.Readings"
+                                 Name="@g.Year.ToString()"
+                                 SeriesType="SeriesType.Line"
+                                 XValue="@(r => new DateTime(2000, r.MeasuredOn.Month, r.MeasuredOn.Day))"
+                                 YValue="@(r => (decimal)r.Celsius)" />
+            }
+        }
+        else
+        {
             <ApexPointSeries TItem="TemperatureReading"
                              Items="_chartOrder"
                              Name="Temperature"
@@ -115,8 +131,8 @@ else
                              ShowDataLabels="true"
                              XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
                              YValue="@(r => (decimal)r.Celsius)" />
-        </ApexChart>
-    }
+        }
+    </ApexChart>
 }
 
 @code {
@@ -127,6 +143,14 @@ else
 
     // Graph year filter. null = show every year.
     private int? _selectedYear;
+
+    // Compare mode: overlay every year as its own line on a shared month axis.
+    private bool _stacked;
+
+    // Validated categorical palette (dataviz skill, light surface) for the
+    // per-year lines in compare mode. Fixed order — one hue per year, never cycled.
+    private static readonly string[] YearColors =
+        ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"];
 
     // Latest reading and all-time extremes (list header).
     private TemperatureReading _latest => _readings!.OrderByDescending(r => r.MeasuredOn).First();
@@ -144,8 +168,21 @@ else
             .OrderBy(r => r.MeasuredOn)
             .ToList();
 
+    // Readings grouped by year (ascending, so colour slots stay stable as new
+    // years are added), each ordered by date, for the compare/overlay mode.
+    private IEnumerable<(int Year, List<TemperatureReading> Readings)> _yearGroups =>
+        _readings!
+            .GroupBy(r => r.MeasuredOn.Year)
+            .OrderBy(g => g.Key)
+            .Select(g => (g.Key, g.OrderBy(r => r.MeasuredOn).ToList()));
+
+    // Distinct key per view so the chart is rebuilt cleanly when the mode changes.
+    private string _chartKey => _stacked ? "stacked" : (_selectedYear?.ToString() ?? "all");
+
     private string _chartTitle =>
-        _selectedYear is null ? "Water temperature (°C)" : $"Water temperature (°C) — {_selectedYear}";
+        _stacked ? "Water temperature (°C) — years compared"
+        : _selectedYear is null ? "Water temperature (°C)"
+        : $"Water temperature (°C) — {_selectedYear}";
 
     private readonly ApexChartOptions<TemperatureReading> _options = new()
     {
@@ -163,8 +200,42 @@ else
 
     private void SelectYear(int? year)
     {
+        _stacked = false;
         _selectedYear = year;
-        UpdateExtremeMarkers();
+        ConfigureChart();
+    }
+
+    private void ShowStacked()
+    {
+        _stacked = true;
+        ConfigureChart();
+    }
+
+    // Reconfigure the shared options object for the current mode. The chart is
+    // rebuilt (see @key) so these take effect on the next render.
+    private void ConfigureChart()
+    {
+        if (_stacked)
+        {
+            _options.Colors = [.. YearColors];
+            _options.Markers!.Discrete = null;
+            _options.DataLabels = new DataLabels { Enabled = false };
+            _options.Xaxis!.Labels = new XAxisLabels
+            {
+                // Month names only (reference year is arbitrary, so hide it).
+                DatetimeFormatter = new DatetimeFormatter { Year = "MMM", Month = "MMM", Day = "dd MMM" },
+            };
+            _options.Tooltip = new Tooltip { X = new TooltipX { Format = "dd MMM" } };
+            _options.Legend = new Legend { Show = true };
+        }
+        else
+        {
+            _options.Colors = ["#234A34"];
+            _options.Xaxis!.Labels = null;
+            _options.Tooltip = null;
+            _options.Legend = new Legend { Show = false };
+            UpdateExtremeMarkers();
+        }
     }
 
     // Highlight the hottest and coldest points of the currently displayed data
@@ -213,6 +284,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         _readings = await Repository.GetRecentAsync(1000);
-        UpdateExtremeMarkers();
+        ConfigureChart();
     }
 }
