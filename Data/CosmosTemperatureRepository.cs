@@ -48,6 +48,35 @@ public class CosmosTemperatureRepository : ITemperatureRepository
         }
     }
 
+    /// <summary>
+    /// Populates the container with the given readings, but only when it is empty, so a
+    /// user's later edits or deletions are never overwritten on the next startup. The
+    /// readings use deterministic ids, so an upsert also makes this safe to run twice.
+    /// </summary>
+    public async Task SeedIfEmptyAsync(IEnumerable<TemperatureReading> readings, CancellationToken ct = default)
+    {
+        var existing = 0;
+        using var countIterator = _container.GetItemQueryIterator<int>(
+            new QueryDefinition("SELECT VALUE COUNT(1) FROM c"));
+        while (countIterator.HasMoreResults)
+        {
+            foreach (var count in await countIterator.ReadNextAsync(ct))
+            {
+                existing += count;
+            }
+        }
+
+        if (existing > 0)
+        {
+            return;
+        }
+
+        foreach (var reading in readings)
+        {
+            await _container.UpsertItemAsync(reading, new PartitionKey(reading.Id), cancellationToken: ct);
+        }
+    }
+
     public async Task<IReadOnlyList<TemperatureReading>> GetRecentAsync(int take = 100, CancellationToken ct = default)
     {
         // MeasuredOn serializes as an ISO date string ("2026-07-16"), so lexical

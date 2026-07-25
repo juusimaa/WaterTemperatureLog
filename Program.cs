@@ -48,6 +48,10 @@ if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     var cosmosClient = app.Services.GetRequiredService<CosmosClient>();
     var database = await cosmosClient.CreateDatabaseIfNotExistsAsync(cosmosDatabase);
     await database.Database.CreateContainerIfNotExistsAsync(cosmosContainer, "/id");
+
+    // Populate the historical readings the first time the container is empty.
+    var repository = (CosmosTemperatureRepository)app.Services.GetRequiredService<ITemperatureRepository>();
+    await repository.SeedIfEmptyAsync(SeedData.Readings);
 }
 
 // Configure the HTTP request pipeline.
