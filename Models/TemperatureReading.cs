@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace WaterTemperatures.Models;
 
@@ -7,7 +8,11 @@ namespace WaterTemperatures.Models;
 /// </summary>
 public class TemperatureReading
 {
-    /// <summary>Unique id. Doubles as the Cosmos DB item id later.</summary>
+    /// <summary>
+    /// Unique id. Serialized as the lowercase <c>id</c> that Cosmos DB requires for
+    /// its item id, and also used as the partition key value (one reading per partition).
+    /// </summary>
+    [JsonPropertyName("id")]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>The day the measurement was taken (no time component).</summary>
