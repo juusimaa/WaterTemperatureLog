@@ -14,3 +14,16 @@
 .latest {
     font-size: 1.1rem;
 }
+
+.graph-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.year-select .form-select {
+    width: auto;
+    min-width: 10rem;
+}

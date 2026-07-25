@@ -64,16 +64,45 @@ else if (_view == View.List)
 }
 else
 {
-    <ApexChart TItem="TemperatureReading"
-               Title="Water temperature (°C)"
-               Options="_options">
-        <ApexPointSeries TItem="TemperatureReading"
-                         Items="_chartOrder"
-                         Name="Temperature"
-                         SeriesType="SeriesType.Line"
-                         XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
-                         YValue="@(r => (decimal)r.Celsius)" />
-    </ApexChart>
+    <div class="graph-filter">
+        <button type="button"
+                class="btn @(_selectedYear is null ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => _selectedYear = null">
+            All years
+        </button>
+
+        <label class="year-select">
+            <span class="visually-hidden">Filter by year</span>
+            <select class="form-select"
+                    value="@(_selectedYear?.ToString() ?? "")"
+                    @onchange="OnYearChanged">
+                <option value="">Select a year…</option>
+                @foreach (var year in _years)
+                {
+                    <option value="@year" selected="@(_selectedYear == year)">@year</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    @if (_chartOrder.Count == 0)
+    {
+        <p><em>No readings for @_selectedYear.</em></p>
+    }
+    else
+    {
+        <ApexChart @key="_selectedYear"
+                   TItem="TemperatureReading"
+                   Title="@_chartTitle"
+                   Options="_options">
+            <ApexPointSeries TItem="TemperatureReading"
+                             Items="_chartOrder"
+                             Name="Temperature"
+                             SeriesType="SeriesType.Line"
+                             XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
+                             YValue="@(r => (decimal)r.Celsius)" />
+        </ApexChart>
+    }
 }
 
 @code {
@@ -82,9 +111,25 @@ else
     private View _view = View.List;
     private IReadOnlyList<TemperatureReading>? _readings;
 
-    // Latest reading (list header) and chart order (oldest-first, left to right).
+    // Graph year filter. null = show every year.
+    private int? _selectedYear;
+
+    // Latest reading (list header).
     private TemperatureReading _latest => _readings!.OrderByDescending(r => r.MeasuredOn).First();
-    private List<TemperatureReading> _chartOrder => _readings!.OrderBy(r => r.MeasuredOn).ToList();
+
+    // Years present in the data, newest first, for the filter dropdown.
+    private IReadOnlyList<int> _years =>
+        _readings!.Select(r => r.MeasuredOn.Year).Distinct().OrderByDescending(y => y).ToList();
+
+    // Chart order (oldest-first, left to right), filtered to the selected year when set.
+    private List<TemperatureReading> _chartOrder =>
+        _readings!
+            .Where(r => _selectedYear is null || r.MeasuredOn.Year == _selectedYear)
+            .OrderBy(r => r.MeasuredOn)
+            .ToList();
+
+    private string _chartTitle =>
+        _selectedYear is null ? "Water temperature (°C)" : $"Water temperature (°C) — {_selectedYear}";
 
     private readonly ApexChartOptions<TemperatureReading> _options = new()
     {
@@ -92,6 +137,11 @@ else
         Markers = new Markers { Size = 4 },
         Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
     };
+
+    private void OnYearChanged(ChangeEventArgs e)
+    {
+        _selectedYear = int.TryParse(e.Value?.ToString(), out var year) ? year : null;
+    }
 
     protected override async Task OnInitializedAsync()
     {
