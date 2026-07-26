@@ -1,12 +1,16 @@
 @* Shows sign-in state and the Easy Auth login/logout links. The /.auth/* endpoints
-   are provided by App Service Easy Auth in Azure (they do not exist on localhost). *@
+   are provided by App Service Easy Auth in Azure (they do not exist on localhost).
+
+   data-enhance-nav="false" forces a full-page navigation instead of Blazor enhanced
+   navigation. Without it, the interactive circuit survives logout and keeps serving
+   its cached (authenticated) state, leaving the edit controls visible after sign-out. *@
 
 <AuthorizeView>
     <Authorized>
         <span class="app-user" title="@context.User.Identity?.Name">@context.User.Identity?.Name</span>
-        <a class="app-auth-link" href="/.auth/logout?post_logout_redirect_uri=/">Log out</a>
+        <a class="app-auth-link" href="/.auth/logout?post_logout_redirect_uri=/" data-enhance-nav="false">Log out</a>
     </Authorized>
     <NotAuthorized>
-        <a class="app-auth-link" href="/.auth/login/google?post_login_redirect_uri=/">Log in to edit</a>
+        <a class="app-auth-link" href="/.auth/login/google?post_login_redirect_uri=/" data-enhance-nav="false">Log in to edit</a>
     </NotAuthorized>
 </AuthorizeView>
