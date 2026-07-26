@@ -21,7 +21,11 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["WaterTemperatures.styles.css"]" />
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    @* SVG is preferred where supported; the PNG is the fallback. Fingerprinted
+       hrefs make browsers pick up icon changes instead of serving a stale one. *@
+    <link rel="icon" type="image/svg+xml" href="@Assets["favicon.svg"]" />
+    <link rel="icon" type="image/png" sizes="64x64" href="@Assets["favicon.png"]" />
+    <link rel="apple-touch-icon" sizes="180x180" href="@Assets["apple-touch-icon.png"]" />
     <title>Water Temperature Log</title>
     <HeadOutlet />
 </head>
