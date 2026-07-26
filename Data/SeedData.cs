@@ -11,6 +11,12 @@ namespace WaterTemperatures.Data;
 public static class SeedData
 {
     /// <summary>
+    /// Attribution for the historical rows: they predate the app, and were all recorded
+    /// and transcribed by Jouni, so they are credited to him rather than left blank.
+    /// </summary>
+    public const string HistoricalEditor = "jouni.uusimaa@gmail.com";
+
+    /// <summary>
     /// Note: the source row "20.7.2032" is a data-entry typo for 2021 and is stored as such.
     /// </summary>
     private static readonly (int Year, int Month, int Day, double Celsius)[] Rows =
@@ -59,8 +65,12 @@ public static class SeedData
     public static IEnumerable<TemperatureReading> Readings =>
         Rows.Select(r => new TemperatureReading
         {
-            Id = $"{r.Year:D4}-{r.Month:D2}-{r.Day:D2}",
+            // Id is derived from MeasuredOn, so it is not set here.
             MeasuredOn = new DateOnly(r.Year, r.Month, r.Day),
             Celsius = r.Celsius,
+            CreatedBy = HistoricalEditor,
+            // The real recording time is unknown, so use midnight UTC on the measurement
+            // day: deterministic, so re-seeding produces byte-identical items.
+            CreatedAt = new DateTimeOffset(new DateTime(r.Year, r.Month, r.Day), TimeSpan.Zero),
         });
 }

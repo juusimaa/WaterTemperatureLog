@@ -1,4 +1,5 @@
 @page "/edit/{id}"
+@using System.Security.Claims
 @inject ITemperatureRepository Repository
 @inject NavigationManager Nav
 @inject AuthenticationStateProvider AuthProvider
@@ -21,13 +22,26 @@
         }
         else
         {
-            <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync">
+            @if (_error is not null)
+            {
+                <div class="alert alert-warning">@_error</div>
+            }
+
+            <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync" DateReadOnly="true">
                 <ExtraButtons>
                     <button type="button" class="btn btn-outline-danger float-end" @onclick="DeleteAsync">
                         Delete
                     </button>
                 </ExtraButtons>
             </ReadingForm>
+
+            <p class="text-muted small mt-3">
+                Added by @(_model.CreatedBy ?? "unknown") on @_model.CreatedAt.ToLocalTime().ToString("g")
+                @if (_model.UpdatedAt is not null)
+                {
+                    <text>&#160;· last edited by @(_model.UpdatedBy ?? "unknown") on @_model.UpdatedAt.Value.ToLocalTime().ToString("g")</text>
+                }
+            </p>
         }
     </Authorized>
     <NotAuthorized>
@@ -44,6 +58,7 @@
 
     private TemperatureReading? _model;
     private bool _loading = true;
+    private string? _error;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,18 +68,30 @@
 
     private async Task SaveAsync()
     {
-        if (!await IsEditorAsync())
+        var editor = await CurrentEditorAsync();
+        if (editor is null)
         {
             return;
         }
 
-        await Repository.UpdateAsync(_model!);
+        _error = null;
+        _model!.UpdatedBy = editor;
+        _model.UpdatedAt = DateTimeOffset.UtcNow;
+
+        // The date is read-only on this form, so the id cannot have moved; a false
+        // result means someone deleted the reading while it was open.
+        if (!await Repository.UpdateAsync(_model))
+        {
+            _error = "This reading was deleted by someone else, so it could not be updated.";
+            return;
+        }
+
         Nav.NavigateTo("/");
     }
 
     private async Task DeleteAsync()
     {
-        if (!await IsEditorAsync())
+        if (await CurrentEditorAsync() is null)
         {
             return;
         }
@@ -73,10 +100,18 @@
         Nav.NavigateTo("/");
     }
 
-    // Server-side guard: never write/delete unless the current user is an editor.
-    private async Task<bool> IsEditorAsync()
+    /// <summary>
+    /// The signed-in editor's email, or null if the user may not write. Doubles as the
+    /// server-side guard: never write or delete unless this returns non-null.
+    /// </summary>
+    private async Task<string?> CurrentEditorAsync()
     {
         var state = await AuthProvider.GetAuthenticationStateAsync();
-        return state.User.IsInRole(AuthOptions.EditorRole);
+        if (!state.User.IsInRole(AuthOptions.EditorRole))
+        {
+            return null;
+        }
+
+        return state.User.FindFirst(ClaimTypes.Email)?.Value ?? state.User.Identity?.Name;
     }
 }

@@ -15,8 +15,21 @@
 
     <div class="mb-3">
         <label class="form-label">Date</label>
-        <InputDate @bind-Value="Model.MeasuredOn" class="form-control" max="@_today" />
-        <ValidationMessage For="() => Model.MeasuredOn" />
+        @if (DateReadOnly)
+        {
+            @* The date is the reading's identity, so it cannot be changed in place.
+               Rendered as plain text plus a hidden field so the bound value survives. *@
+            <input type="date" class="form-control" value="@_measuredOn" readonly disabled />
+            <div class="form-text">
+                The date identifies the reading and cannot be changed. To move it to another
+                day, delete this reading and add it again.
+            </div>
+        }
+        else
+        {
+            <InputDate @bind-Value="Model.MeasuredOn" class="form-control" max="@_today" />
+            <ValidationMessage For="() => Model.MeasuredOn" />
+        }
     </div>
 
     <div class="mb-3">
@@ -43,5 +56,13 @@
     /// <summary>Optional extra buttons (e.g. Delete) rendered after Cancel.</summary>
     [Parameter] public RenderFragment? ExtraButtons { get; set; }
 
+    /// <summary>
+    /// Show the date as read-only. Set when editing: the date is the reading's id, so
+    /// changing it in place would mean moving the item to a different key.
+    /// </summary>
+    [Parameter] public bool DateReadOnly { get; set; }
+
     private readonly string _today = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
+
+    private string _measuredOn => Model.MeasuredOn.ToString("yyyy-MM-dd");
 }

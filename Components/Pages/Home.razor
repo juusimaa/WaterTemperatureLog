@@ -60,6 +60,10 @@ else if (_view == View.List)
                     <th>Date</th>
                     <th class="text-end">°C</th>
                     <th>Note</th>
+                    @* Editor emails are shown to editors only, not to public visitors. *@
+                    <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCol">
+                        <th>By</th>
+                    </AuthorizeView>
                     <th></th>
                 </tr>
             </thead>
@@ -70,6 +74,11 @@ else if (_view == View.List)
                         <td class="text-nowrap">@r.MeasuredOn.ToString("d")</td>
                         <td class="text-end">@r.Celsius.ToString("0.0")</td>
                         <td>@r.Note</td>
+                        <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCell">
+                            <td class="text-nowrap small text-muted" title="@EditedTitle(r)">
+                                @(r.LastEditedBy ?? "—")
+                            </td>
+                        </AuthorizeView>
                         <td class="text-end">
                             <AuthorizeView Roles="@AuthOptions.EditorRole">
                                 <a href="@($"/edit/{r.Id}")">Edit</a>
@@ -198,6 +207,13 @@ else
         Markers = new Markers { Size = 4 },
         Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
     };
+
+    // Full provenance for the "By" column, shown on hover.
+    private static string EditedTitle(TemperatureReading r) =>
+        r.UpdatedAt is null
+            ? $"Added by {r.CreatedBy ?? "unknown"} on {r.CreatedAt.ToLocalTime():g}"
+            : $"Added by {r.CreatedBy ?? "unknown"} on {r.CreatedAt.ToLocalTime():g}; " +
+              $"last edited by {r.UpdatedBy ?? "unknown"} on {r.UpdatedAt.Value.ToLocalTime():g}";
 
     private void OnYearChanged(ChangeEventArgs e)
     {

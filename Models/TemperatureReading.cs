@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace WaterTemperatures.Models;
@@ -9,11 +10,13 @@ namespace WaterTemperatures.Models;
 public class TemperatureReading
 {
     /// <summary>
-    /// Unique id. Serialized as the lowercase <c>id</c> that Cosmos DB requires for
-    /// its item id, and also used as the partition key value (one reading per partition).
+    /// Unique id, derived from <see cref="MeasuredOn"/> as <c>yyyy-MM-dd</c>. Serialized as
+    /// the lowercase <c>id</c> that Cosmos DB requires, and also used as the partition key
+    /// value. Deriving it from the date is what enforces one reading per day: a second
+    /// insert for the same date collides on the id and is rejected by the store.
     /// </summary>
     [JsonPropertyName("id")]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Id => IdFor(MeasuredOn);
 
     /// <summary>The day the measurement was taken (no time component).</summary>
     [NotInFuture(ErrorMessage = "Date cannot be in the future.")]
@@ -26,4 +29,23 @@ public class TemperatureReading
     /// <summary>Optional note (weather, who measured, etc.).</summary>
     [MaxLength(500)]
     public string? Note { get; set; }
+
+    /// <summary>Email of the editor who first added this reading.</summary>
+    public string? CreatedBy { get; set; }
+
+    /// <summary>When this reading was first added.</summary>
+    public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>Email of the editor who last changed this reading, or null if never edited.</summary>
+    public string? UpdatedBy { get; set; }
+
+    /// <summary>When this reading was last changed, or null if never edited.</summary>
+    public DateTimeOffset? UpdatedAt { get; set; }
+
+    /// <summary>The editor responsible for the current values — the last editor, or the creator.</summary>
+    [JsonIgnore]
+    public string? LastEditedBy => UpdatedBy ?? CreatedBy;
+
+    /// <summary>The item id a reading on <paramref name="date"/> has (or would have).</summary>
+    public static string IdFor(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 }

@@ -19,11 +19,10 @@ public class InMemoryTemperatureRepository : ITemperatureRepository
         }
     }
 
-    public Task AddAsync(TemperatureReading reading, CancellationToken ct = default)
-    {
-        _store[reading.Id] = reading;
-        return Task.CompletedTask;
-    }
+    // Mirrors the Cosmos behaviour deliberately: insert-only, never an overwrite, so a
+    // duplicate date fails the same way locally as it does in production.
+    public Task<AddResult> AddAsync(TemperatureReading reading, CancellationToken ct = default)
+        => Task.FromResult(_store.TryAdd(reading.Id, reading) ? AddResult.Added : AddResult.DuplicateDate);
 
     public Task<TemperatureReading?> GetByIdAsync(string id, CancellationToken ct = default)
     {
@@ -31,10 +30,14 @@ public class InMemoryTemperatureRepository : ITemperatureRepository
         return Task.FromResult(reading);
     }
 
-    public Task UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
+    public Task<bool> UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
     {
-        _store[reading.Id] = reading;
-        return Task.CompletedTask;
+        if (!_store.TryGetValue(reading.Id, out var existing))
+        {
+            return Task.FromResult(false);
+        }
+
+        return Task.FromResult(_store.TryUpdate(reading.Id, reading, existing));
     }
 
     public Task DeleteAsync(string id, CancellationToken ct = default)

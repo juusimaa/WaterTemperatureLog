@@ -62,6 +62,16 @@ if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     // Populate the historical readings the first time the container is empty.
     var repository = (CosmosTemperatureRepository)app.Services.GetRequiredService<ITemperatureRepository>();
     await repository.SeedIfEmptyAsync(SeedData.Readings);
+
+    // Containers seeded before the app tracked authorship have no creator on their
+    // readings; credit those to the historical editor. No-op once it has run.
+    var backfilled = await repository.BackfillMissingEditorAsync(SeedData.HistoricalEditor);
+    if (backfilled > 0)
+    {
+        app.Logger.LogInformation(
+            "Backfilled {Count} reading(s) with historical editor {Editor}.",
+            backfilled, SeedData.HistoricalEditor);
+    }
 }
 
 // Configure the HTTP request pipeline.

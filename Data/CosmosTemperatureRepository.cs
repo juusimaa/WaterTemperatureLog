@@ -16,8 +16,20 @@ public class CosmosTemperatureRepository : ITemperatureRepository
 
     public CosmosTemperatureRepository(Container container) => _container = container;
 
-    public async Task AddAsync(TemperatureReading reading, CancellationToken ct = default)
-        => await _container.CreateItemAsync(reading, new PartitionKey(reading.Id), cancellationToken: ct);
+    public async Task<AddResult> AddAsync(TemperatureReading reading, CancellationToken ct = default)
+    {
+        try
+        {
+            await _container.CreateItemAsync(reading, new PartitionKey(reading.Id), cancellationToken: ct);
+            return AddResult.Added;
+        }
+        catch (CosmosException e) when (e.StatusCode == HttpStatusCode.Conflict)
+        {
+            // The id is the date, so a 409 means a reading for that day already exists.
+            // Callers pre-check, but two editors saving at once can still land here.
+            return AddResult.DuplicateDate;
+        }
+    }
 
     public async Task<TemperatureReading?> GetByIdAsync(string id, CancellationToken ct = default)
     {
@@ -33,8 +45,20 @@ public class CosmosTemperatureRepository : ITemperatureRepository
         }
     }
 
-    public async Task UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
-        => await _container.ReplaceItemAsync(reading, reading.Id, new PartitionKey(reading.Id), cancellationToken: ct);
+    public async Task<bool> UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
+    {
+        try
+        {
+            await _container.ReplaceItemAsync(
+                reading, reading.Id, new PartitionKey(reading.Id), cancellationToken: ct);
+            return true;
+        }
+        catch (CosmosException e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            // Deleted between loading the form and saving it.
+            return false;
+        }
+    }
 
     public async Task DeleteAsync(string id, CancellationToken ct = default)
     {
@@ -75,6 +99,42 @@ public class CosmosTemperatureRepository : ITemperatureRepository
         {
             await _container.UpsertItemAsync(reading, new PartitionKey(reading.Id), cancellationToken: ct);
         }
+    }
+
+    /// <summary>
+    /// One-time backfill for readings stored before the app recorded authorship: stamps
+    /// <paramref name="editor"/> as the creator, dated to the measurement day. Idempotent —
+    /// readings that already have a creator are left untouched, so it is safe to run on
+    /// every startup and does no writes once the container has been backfilled.
+    /// </summary>
+    /// <returns>The number of readings updated.</returns>
+    public async Task<int> BackfillMissingEditorAsync(string editor, CancellationToken ct = default)
+    {
+        var query = new QueryDefinition(
+            "SELECT * FROM c WHERE NOT IS_DEFINED(c.CreatedBy) OR IS_NULL(c.CreatedBy)");
+
+        var stale = new List<TemperatureReading>();
+        using var iterator = _container.GetItemQueryIterator<TemperatureReading>(query);
+        while (iterator.HasMoreResults)
+        {
+            stale.AddRange(await iterator.ReadNextAsync(ct));
+        }
+
+        foreach (var reading in stale)
+        {
+            reading.CreatedBy = editor;
+            if (reading.CreatedAt == default)
+            {
+                // The real recording time is unknown; use midnight UTC on the measured day.
+                reading.CreatedAt = new DateTimeOffset(
+                    reading.MeasuredOn.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            }
+
+            await _container.ReplaceItemAsync(
+                reading, reading.Id, new PartitionKey(reading.Id), cancellationToken: ct);
+        }
+
+        return stale.Count;
     }
 
     public async Task<IReadOnlyList<TemperatureReading>> GetRecentAsync(int take = 100, CancellationToken ct = default)
