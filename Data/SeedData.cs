@@ -19,7 +19,7 @@ public static class SeedData
     /// <summary>
     /// Note: the source row "20.7.2032" is a data-entry typo for 2021 and is stored as such.
     /// </summary>
-    private static readonly (int Year, int Month, int Day, double Celsius)[] Rows =
+    private static readonly (int Year, int Month, int Day, decimal Celsius)[] Rows =
     [
         (2021, 6, 25, 17),
         (2021, 7, 13, 24),

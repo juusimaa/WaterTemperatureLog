@@ -134,7 +134,7 @@ else
                                  Name="@g.Year.ToString()"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(r => new DateTime(2000, r.MeasuredOn.Month, r.MeasuredOn.Day))"
-                                 YValue="@(r => (decimal)r.Celsius)" />
+                                 YValue="@(r => r.Celsius)" />
             }
         }
         else
@@ -145,7 +145,7 @@ else
                              SeriesType="SeriesType.Line"
                              ShowDataLabels="true"
                              XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
-                             YValue="@(r => (decimal)r.Celsius)" />
+                             YValue="@(r => r.Celsius)" />
         }
     </ApexChart>
 }

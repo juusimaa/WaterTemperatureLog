@@ -22,9 +22,12 @@ public class TemperatureReading
     [NotInFuture(ErrorMessage = "Date cannot be in the future.")]
     public DateOnly MeasuredOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
-    /// <summary>Water temperature in degrees Celsius.</summary>
-    [Range(0, 40, ErrorMessage = "Temperature must be between 0 and 40 °C.")]
-    public double Celsius { get; set; }
+    /// <summary>
+    /// Water temperature in degrees Celsius. <see cref="decimal"/> rather than
+    /// <see cref="double"/> so a reading like 12.5 is stored and compared exactly.
+    /// </summary>
+    [Range(0.0, 40.0, ErrorMessage = "Temperature must be between 0 and 40 °C.")]
+    public decimal Celsius { get; set; }
 
     /// <summary>Optional note (weather, who measured, etc.).</summary>
     [MaxLength(500)]
@@ -41,6 +44,19 @@ public class TemperatureReading
 
     /// <summary>When this reading was last changed, or null if never edited.</summary>
     public DateTimeOffset? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// True once the reading has been deleted. Deletes are soft: the item stays in the
+    /// store so an accidental delete can be undone, but it is hidden from every list and
+    /// lookup. The date stays occupied, so re-adding that day revives this item.
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>Email of the editor who deleted this reading, or null if it is not deleted.</summary>
+    public string? DeletedBy { get; set; }
+
+    /// <summary>When this reading was deleted, or null if it is not deleted.</summary>
+    public DateTimeOffset? DeletedAt { get; set; }
 
     /// <summary>The editor responsible for the current values — the last editor, or the creator.</summary>
     [JsonIgnore]

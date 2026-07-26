@@ -25,28 +25,44 @@ public class CosmosTemperatureRepository : ITemperatureRepository
         }
         catch (CosmosException e) when (e.StatusCode == HttpStatusCode.Conflict)
         {
-            // The id is the date, so a 409 means a reading for that day already exists.
-            // Callers pre-check, but two editors saving at once can still land here.
-            return AddResult.DuplicateDate;
+            // The id is the date, so a 409 means that day is already taken — either by a
+            // live reading (reject) or by a soft-deleted one (revive it with the new
+            // values). Callers pre-check, but two editors saving at once still land here.
+            var existing = await ReadRawAsync(reading.Id, ct);
+            if (existing is null)
+            {
+                // Hard-deleted in the gap between the conflict and this read; retry once.
+                await _container.CreateItemAsync(reading, new PartitionKey(reading.Id), cancellationToken: ct);
+                return AddResult.Added;
+            }
+
+            if (!existing.IsDeleted)
+            {
+                return AddResult.DuplicateDate;
+            }
+
+            await _container.ReplaceItemAsync(
+                reading, reading.Id, new PartitionKey(reading.Id), cancellationToken: ct);
+            return AddResult.Added;
         }
     }
 
     public async Task<TemperatureReading?> GetByIdAsync(string id, CancellationToken ct = default)
     {
-        try
-        {
-            var response = await _container.ReadItemAsync<TemperatureReading>(
-                id, new PartitionKey(id), cancellationToken: ct);
-            return response.Resource;
-        }
-        catch (CosmosException e) when (e.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
+        var reading = await ReadRawAsync(id, ct);
+        return reading is { IsDeleted: false } ? reading : null;
     }
 
     public async Task<bool> UpdateAsync(TemperatureReading reading, CancellationToken ct = default)
     {
+        // Do not resurrect a deleted reading through the edit form: an update to a
+        // deleted date must fail the same way an update to a missing one does.
+        var existing = await ReadRawAsync(reading.Id, ct);
+        if (existing is null || existing.IsDeleted)
+        {
+            return false;
+        }
+
         try
         {
             await _container.ReplaceItemAsync(
@@ -60,15 +76,41 @@ public class CosmosTemperatureRepository : ITemperatureRepository
         }
     }
 
-    public async Task DeleteAsync(string id, CancellationToken ct = default)
+    public async Task<bool> DeleteAsync(string id, string deletedBy, CancellationToken ct = default)
     {
+        var reading = await ReadRawAsync(id, ct);
+        if (reading is null || reading.IsDeleted)
+        {
+            return false;
+        }
+
+        reading.IsDeleted = true;
+        reading.DeletedBy = deletedBy;
+        reading.DeletedAt = DateTimeOffset.UtcNow;
+
         try
         {
-            await _container.DeleteItemAsync<TemperatureReading>(id, new PartitionKey(id), cancellationToken: ct);
+            await _container.ReplaceItemAsync(reading, id, new PartitionKey(id), cancellationToken: ct);
+            return true;
         }
         catch (CosmosException e) when (e.StatusCode == HttpStatusCode.NotFound)
         {
-            // No-op if it does not exist, matching the interface contract.
+            return false;
+        }
+    }
+
+    /// <summary>Point-read an item including soft-deleted ones, or null if it is absent.</summary>
+    private async Task<TemperatureReading?> ReadRawAsync(string id, CancellationToken ct)
+    {
+        try
+        {
+            var response = await _container.ReadItemAsync<TemperatureReading>(
+                id, new PartitionKey(id), cancellationToken: ct);
+            return response.Resource;
+        }
+        catch (CosmosException e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
         }
     }
 
@@ -141,8 +183,10 @@ public class CosmosTemperatureRepository : ITemperatureRepository
     {
         // MeasuredOn serializes as an ISO date string ("2026-07-16"), so lexical
         // descending order is the same as chronological newest-first order.
+        // IS_DEFINED guards readings written before soft delete existed.
         var query = new QueryDefinition(
-                "SELECT * FROM c ORDER BY c.MeasuredOn DESC OFFSET 0 LIMIT @take")
+                "SELECT * FROM c WHERE NOT IS_DEFINED(c.IsDeleted) OR c.IsDeleted = false " +
+                "ORDER BY c.MeasuredOn DESC OFFSET 0 LIMIT @take")
             .WithParameter("@take", take);
 
         var results = new List<TemperatureReading>(take);

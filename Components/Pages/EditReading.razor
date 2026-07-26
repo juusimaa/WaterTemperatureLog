@@ -27,9 +27,27 @@
                 <div class="alert alert-warning">@_error</div>
             }
 
+            @if (_confirmingDelete)
+            {
+                <div class="alert alert-danger">
+                    Delete the reading for <strong>@_model.MeasuredOn.ToString("d")</strong>
+                    (@_model.Celsius.ToString("0.0") °C)?
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="DeleteAsync">
+                            Yes, delete it
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                @onclick="() => _confirmingDelete = false">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            }
+
             <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync" DateReadOnly="true">
                 <ExtraButtons>
-                    <button type="button" class="btn btn-outline-danger float-end" @onclick="DeleteAsync">
+                    <button type="button" class="btn btn-outline-danger float-end"
+                            @onclick="() => _confirmingDelete = true">
                         Delete
                     </button>
                 </ExtraButtons>
@@ -59,6 +77,7 @@
     private TemperatureReading? _model;
     private bool _loading = true;
     private string? _error;
+    private bool _confirmingDelete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,12 +110,21 @@
 
     private async Task DeleteAsync()
     {
-        if (await CurrentEditorAsync() is null)
+        var editor = await CurrentEditorAsync();
+        if (editor is null)
         {
             return;
         }
 
-        await Repository.DeleteAsync(Id);
+        _confirmingDelete = false;
+
+        // Soft delete: the reading is hidden, not destroyed, so a mis-click is recoverable.
+        if (!await Repository.DeleteAsync(Id, editor))
+        {
+            _error = "This reading has already been deleted by someone else.";
+            return;
+        }
+
         Nav.NavigateTo("/");
     }
 
