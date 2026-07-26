@@ -1,13 +1,25 @@
 @page "/add"
 @inject ITemperatureRepository Repository
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
 
 <PageTitle>Add a reading — @AppText.AppName</PageTitle>
 
 <h1>Add a reading</h1>
 
-<ReadingForm Model="_model" SubmitLabel="Save" OnValidSubmit="SaveAsync" />
+<AuthorizeView Roles="@AuthOptions.EditorRole">
+    <Authorized>
+        <ReadingForm Model="_model" SubmitLabel="Save" OnValidSubmit="SaveAsync" />
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-info">
+            You need to be signed in as an editor to add readings.
+            <a href="/.auth/login/google?post_login_redirect_uri=/add">Log in</a>.
+        </div>
+        <a class="btn btn-secondary" href="/">Back</a>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     // MeasuredOn defaults to today via the model initializer.
@@ -15,7 +27,19 @@
 
     private async Task SaveAsync()
     {
+        // Server-side guard: never write unless the current user is an editor.
+        if (!await IsEditorAsync())
+        {
+            return;
+        }
+
         await Repository.AddAsync(_model);
         Nav.NavigateTo("/");
+    }
+
+    private async Task<bool> IsEditorAsync()
+    {
+        var state = await AuthProvider.GetAuthenticationStateAsync();
+        return state.User.IsInRole(AuthOptions.EditorRole);
     }
 }

@@ -1,31 +1,43 @@
 @page "/edit/{id}"
 @inject ITemperatureRepository Repository
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
 
 <PageTitle>Edit reading — @AppText.AppName</PageTitle>
 
 <h1>Edit reading</h1>
 
-@if (_loading)
-{
-    <p><em>Loading…</em></p>
-}
-else if (_model is null)
-{
-    <div class="alert alert-warning">Reading not found.</div>
-    <a class="btn btn-secondary" href="/">Back</a>
-}
-else
-{
-    <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync">
-        <ExtraButtons>
-            <button type="button" class="btn btn-outline-danger float-end" @onclick="DeleteAsync">
-                Delete
-            </button>
-        </ExtraButtons>
-    </ReadingForm>
-}
+<AuthorizeView Roles="@AuthOptions.EditorRole">
+    <Authorized>
+        @if (_loading)
+        {
+            <p><em>Loading…</em></p>
+        }
+        else if (_model is null)
+        {
+            <div class="alert alert-warning">Reading not found.</div>
+            <a class="btn btn-secondary" href="/">Back</a>
+        }
+        else
+        {
+            <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync">
+                <ExtraButtons>
+                    <button type="button" class="btn btn-outline-danger float-end" @onclick="DeleteAsync">
+                        Delete
+                    </button>
+                </ExtraButtons>
+            </ReadingForm>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-info">
+            You need to be signed in as an editor to change readings.
+            <a href="@($"/.auth/login/google?post_login_redirect_uri=/edit/{Id}")">Log in</a>.
+        </div>
+        <a class="btn btn-secondary" href="/">Back</a>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     [Parameter] public string Id { get; set; } = default!;
@@ -41,13 +53,30 @@ else
 
     private async Task SaveAsync()
     {
+        if (!await IsEditorAsync())
+        {
+            return;
+        }
+
         await Repository.UpdateAsync(_model!);
         Nav.NavigateTo("/");
     }
 
     private async Task DeleteAsync()
     {
+        if (!await IsEditorAsync())
+        {
+            return;
+        }
+
         await Repository.DeleteAsync(Id);
         Nav.NavigateTo("/");
+    }
+
+    // Server-side guard: never write/delete unless the current user is an editor.
+    private async Task<bool> IsEditorAsync()
+    {
+        var state = await AuthProvider.GetAuthenticationStateAsync();
+        return state.User.IsInRole(AuthOptions.EditorRole);
     }
 }

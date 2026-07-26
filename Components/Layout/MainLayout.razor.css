@@ -33,6 +33,33 @@
     color: rgba(255, 255, 255, 0.82);
 }
 
+/* Sign-in state pushed to the right of the header band. */
+.app-auth {
+    margin-left: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.app-user {
+    color: rgba(255, 255, 255, 0.82);
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-auth-link {
+    color: #fff;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.app-auth-link:hover {
+    color: #fff;
+}
+
 .app-main {
     flex: 1;
     display: flex;

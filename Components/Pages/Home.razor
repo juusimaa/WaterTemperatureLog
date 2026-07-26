@@ -7,7 +7,9 @@
 <h1 class="visually-hidden">@AppText.AppName</h1>
 
 <div class="toolbar">
-    <a class="btn btn-primary" href="/add">+ Add measurement</a>
+    <AuthorizeView Roles="@AuthOptions.EditorRole">
+        <a class="btn btn-primary" href="/add">+ Add measurement</a>
+    </AuthorizeView>
 
     <div class="btn-group view-toggle" role="group" aria-label="View toggle">
         <button type="button"
@@ -68,7 +70,11 @@ else if (_view == View.List)
                         <td class="text-nowrap">@r.MeasuredOn.ToString("d")</td>
                         <td class="text-end">@r.Celsius.ToString("0.0")</td>
                         <td>@r.Note</td>
-                        <td class="text-end"><a href="@($"/edit/{r.Id}")">Edit</a></td>
+                        <td class="text-end">
+                            <AuthorizeView Roles="@AuthOptions.EditorRole">
+                                <a href="@($"/edit/{r.Id}")">Edit</a>
+                            </AuthorizeView>
+                        </td>
                     </tr>
                 }
             </tbody>

@@ -1,6 +1,9 @@
 using System.Text.Json;
 using ApexCharts;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.Azure.Cosmos;
+using WaterTemperatures.Auth;
 using WaterTemperatures.Components;
 using WaterTemperatures.Data;
 
@@ -9,6 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Authentication/authorization. Sign-in is handled by App Service Easy Auth; here we
+// only read the resulting identity (see EasyAuthMiddleware) and flow it to components.
+builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 
 // Storage: use Cosmos DB when a connection string is configured (production, or a
 // local emulator); otherwise fall back to the in-memory seed data for local dev.
@@ -63,6 +73,10 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+
+// Translate the Easy Auth identity (or the dev fallback) into HttpContext.User before
+// components render, so AuthorizeView and the editor checks see the signed-in user.
+app.UseMiddleware<EasyAuthMiddleware>();
 
 app.UseAntiforgery();
 
