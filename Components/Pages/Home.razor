@@ -1,4 +1,5 @@
 @page "/"
+@using System.Globalization
 @inject ITemperatureRepository Repository
 @rendermode InteractiveServer
 
@@ -120,32 +121,32 @@ else
     </div>
 
     <ApexChart @key="_chartKey"
-               TItem="TemperatureReading"
+               TItem="ChartPoint"
                Title="@_chartTitle"
                Options="_options">
         @if (_stacked)
         {
-            @* One line per year, all overlaid on a shared month axis (mapped to a
-               common reference year) so seasons line up for comparison. *@
+            @* One bar series per year, grouped by month, so the same part of the
+               season can be compared across years side by side. *@
             @foreach (var g in _yearGroups)
             {
-                <ApexPointSeries TItem="TemperatureReading"
-                                 Items="g.Readings"
+                <ApexPointSeries TItem="ChartPoint"
+                                 Items="g.Points"
                                  Name="@g.Year.ToString()"
-                                 SeriesType="SeriesType.Line"
-                                 XValue="@(r => new DateTime(2000, r.MeasuredOn.Month, r.MeasuredOn.Day))"
-                                 YValue="@(r => r.Celsius)" />
+                                 SeriesType="SeriesType.Bar"
+                                 XValue="@(p => p.Label)"
+                                 YValue="@(p => p.Celsius)" />
             }
         }
         else
         {
-            <ApexPointSeries TItem="TemperatureReading"
-                             Items="_chartOrder"
+            <ApexPointSeries TItem="ChartPoint"
+                             Items="_linePoints"
                              Name="Temperature"
                              SeriesType="SeriesType.Line"
                              ShowDataLabels="true"
-                             XValue="@(r => r.MeasuredOn.ToDateTime(TimeOnly.MinValue))"
-                             YValue="@(r => r.Celsius)" />
+                             XValue="@(p => p.MeasuredOn)"
+                             YValue="@(p => p.Celsius)" />
         }
     </ApexChart>
 }
@@ -159,11 +160,19 @@ else
     // Graph year filter. null = show every year.
     private int? _selectedYear;
 
-    // Compare mode: overlay every year as its own line on a shared month axis.
+    // Compare mode: one bar series per year on a shared month axis.
     private bool _stacked;
 
+    /// <summary>
+    /// A single plotted point. <see cref="Celsius"/> is nullable so a year with no
+    /// readings in a month leaves a gap in compare mode rather than a bar at zero,
+    /// which lets every year carry the full set of month categories and keeps the
+    /// grouped bars aligned with their labels.
+    /// </summary>
+    private sealed record ChartPoint(DateTime MeasuredOn, string Label, decimal? Celsius);
+
     // Validated categorical palette (dataviz skill, light surface) for the
-    // per-year lines in compare mode. Fixed order — one hue per year, never cycled.
+    // per-year bars in compare mode. Fixed order — one hue per year, never cycled.
     private static readonly string[] YearColors =
         ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"];
 
@@ -183,23 +192,44 @@ else
             .OrderBy(r => r.MeasuredOn)
             .ToList();
 
-    // Readings grouped by year (ascending, so colour slots stay stable as new
-    // years are added), each ordered by date, for the compare/overlay mode.
-    private IEnumerable<(int Year, List<TemperatureReading> Readings)> _yearGroups =>
+    // The plotted points of the single-line mode, oldest first.
+    private List<ChartPoint> _linePoints =>
+        _chartOrder
+            .Select(r => new ChartPoint(r.MeasuredOn.ToDateTime(TimeOnly.MinValue),
+                                        r.MeasuredOn.ToString("MMM", CultureInfo.InvariantCulture),
+                                        r.Celsius))
+            .ToList();
+
+    // Months that occur anywhere in the data, ascending — the shared category axis
+    // of the compare mode.
+    private IReadOnlyList<int> _months =>
+        _readings!.Select(r => r.MeasuredOn.Month).Distinct().Order().ToList();
+
+    // One bar series per year (ascending, so colour slots stay stable as new years
+    // are added): the mean temperature per month. Every year gets a point for every
+    // month on the axis, null where it has no readings, so the grouped bars line up.
+    private IEnumerable<(int Year, List<ChartPoint> Points)> _yearGroups =>
         _readings!
             .GroupBy(r => r.MeasuredOn.Year)
             .OrderBy(g => g.Key)
-            .Select(g => (g.Key, g.OrderBy(r => r.MeasuredOn).ToList()));
+            .Select(g => (g.Key, _months.Select(month =>
+            {
+                var inMonth = g.Where(r => r.MeasuredOn.Month == month).ToList();
+                var date = new DateTime(2000, month, 1);
+                return new ChartPoint(date,
+                                      date.ToString("MMM", CultureInfo.InvariantCulture),
+                                      inMonth.Count == 0 ? null : Math.Round(inMonth.Average(r => r.Celsius), 1));
+            }).ToList()));
 
     // Distinct key per view so the chart is rebuilt cleanly when the mode changes.
     private string _chartKey => _stacked ? "stacked" : (_selectedYear?.ToString() ?? "all");
 
     private string _chartTitle =>
-        _stacked ? "Water temperature (°C) — years compared"
+        _stacked ? "Water temperature (°C) — monthly average by year"
         : _selectedYear is null ? "Water temperature (°C)"
         : $"Water temperature (°C) — {_selectedYear}";
 
-    private readonly ApexChartOptions<TemperatureReading> _options = new()
+    private readonly ApexChartOptions<ChartPoint> _options = new()
     {
         // Deep green (--green-deep) to match the header and button accents.
         Colors = ["#234A34"],
@@ -242,18 +272,25 @@ else
             _options.Colors = [.. YearColors];
             _options.Markers!.Discrete = null;
             _options.DataLabels = new DataLabels { Enabled = false };
-            _options.Xaxis!.Labels = new XAxisLabels
+            // One category per month, with a bar per year inside it.
+            _options.Xaxis!.Type = XAxisType.Category;
+            _options.Xaxis.Labels = null;
+            _options.PlotOptions = new PlotOptions
             {
-                // Month names only (reference year is arbitrary, so hide it).
-                DatetimeFormatter = new DatetimeFormatter { Year = "MMM", Month = "MMM", Day = "dd MMM" },
+                Bar = new PlotOptionsBar { ColumnWidth = "80%", BorderRadius = 3 },
             };
-            _options.Tooltip = new Tooltip { X = new TooltipX { Format = "dd MMM" } };
+            // Bars carry their own fill; a stroke would only add a coloured outline.
+            _options.Stroke!.Show = false;
+            _options.Tooltip = new Tooltip { Shared = true, Intersect = false };
             _options.Legend = new Legend { Show = true };
         }
         else
         {
             _options.Colors = ["#234A34"];
-            _options.Xaxis!.Labels = null;
+            _options.Xaxis!.Type = XAxisType.Datetime;
+            _options.Xaxis.Labels = null;
+            _options.PlotOptions = null;
+            _options.Stroke!.Show = true;
             _options.Tooltip = null;
             _options.Legend = new Legend { Show = false };
             UpdateExtremeMarkers();
