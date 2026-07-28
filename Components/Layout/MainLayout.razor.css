@@ -11,26 +11,26 @@
     align-items: baseline;
     gap: 0.25rem 1rem;
     padding: 0.9rem 1.5rem;
-    background-image: linear-gradient(90deg, var(--ink) 0%, var(--green) 70%, var(--green-deep) 100%);
-    color: #fff;
+    background-image: linear-gradient(90deg, var(--header-from) 0%, var(--header-via) 70%, var(--header-to) 100%);
+    color: var(--header-fg);
     box-shadow: var(--shadow);
 }
 
 .app-brand {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--header-fg);
     text-decoration: none;
 }
 
 .app-brand:hover {
-    color: #fff;
+    color: var(--header-fg);
     text-decoration: none;
 }
 
 .app-subtitle {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.82);
+    color: var(--header-fg-soft);
 }
 
 /* Sign-in state pushed to the right of the header band. */
@@ -42,23 +42,8 @@
     font-size: 0.9rem;
 }
 
-.app-user {
-    color: rgba(255, 255, 255, 0.82);
-    max-width: 16rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.app-auth-link {
-    color: #fff;
-    text-decoration: underline;
-    white-space: nowrap;
-}
-
-.app-auth-link:hover {
-    color: #fff;
-}
+/* .app-user and .app-auth-link live in LoginDisplay.razor.css: they belong to a
+   child component, which this component's scoped styles cannot reach. */
 
 .app-main {
     flex: 1;

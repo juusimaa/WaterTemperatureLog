@@ -171,6 +171,13 @@ else
     /// </summary>
     private sealed record ChartPoint(DateTime MeasuredOn, string Label, decimal? Celsius);
 
+    // The single-series line. The chart is rendered server-side and cannot know
+    // the visitor's colour preference, so this is the mid green (--green) that
+    // clears 3:1 against both the light and the dark page background — unlike
+    // --green-deep, which all but vanishes on the dark one. White data labels sit
+    // on it at 5:1.
+    private const string LineColor = "#3E7A57";
+
     // Validated categorical palette (dataviz skill, light surface) for the
     // per-year bars in compare mode. Fixed order — one hue per year, never cycled.
     private static readonly string[] YearColors =
@@ -232,7 +239,7 @@ else
     private readonly ApexChartOptions<ChartPoint> _options = new()
     {
         // Deep green (--green-deep) to match the header and button accents.
-        Colors = ["#234A34"],
+        Colors = [LineColor],
         Xaxis = new XAxis { Type = XAxisType.Datetime },
         Markers = new Markers { Size = 4 },
         Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
@@ -286,7 +293,7 @@ else
         }
         else
         {
-            _options.Colors = ["#234A34"];
+            _options.Colors = [LineColor];
             _options.Xaxis!.Type = XAxisType.Datetime;
             _options.Xaxis.Labels = null;
             _options.PlotOptions = null;

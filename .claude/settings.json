@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kill %bx2u1gzfs)",
+      "Bash(curl -s http://localhost:5211/WaterTemperatures.styles.css)",
+      "Bash(lsof -ti :5211 -sTCP:LISTEN)",
+      "Bash(kill 6134)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./after --dark --size 1280x900 --click \"Graph\" --shot line --eval \"\\(\\(\\)=>{const el=document.querySelector\\('.apexcharts-inner'\\);const r=el.getBoundingClientRect\\(\\);const x=r.left+r.width*0.72,y=r.top+r.height*0.4;for\\(const t of ['mouseenter','mousemove','mousemove']\\){el.dispatchEvent\\(new MouseEvent\\(t,{bubbles:true,clientX:x,clientY:y}\\)\\);}return 'ok';}\\)\\(\\)\" --wait 600 --shot tooltip-line --click \"Compare years\" --eval \"\\(\\(\\)=>{const el=document.querySelector\\('.apexcharts-inner'\\);const r=el.getBoundingClientRect\\(\\);const x=r.left+r.width*0.62,y=r.top+r.height*0.5;for\\(const t of ['mouseenter','mousemove','mousemove']\\){el.dispatchEvent\\(new MouseEvent\\(t,{bubbles:true,clientX:x,clientY:y}\\)\\);}return 'ok';}\\)\\(\\)\" --wait 600 --shot tooltip-compare)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./after-light --size 1280x900 --click \"Graph\" --eval \"\\(\\(\\)=>{const el=document.querySelector\\('.apexcharts-inner'\\);const r=el.getBoundingClientRect\\(\\);const x=r.left+r.width*0.72,y=r.top+r.height*0.4;for\\(const t of ['mouseenter','mousemove','mousemove']\\){el.dispatchEvent\\(new MouseEvent\\(t,{bubbles:true,clientX:x,clientY:y}\\)\\);}return 'ok';}\\)\\(\\)\" --wait 600 --shot line)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./after --dark --size 1280x520 --shot add)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./probe --dark --size 800x400 --eval \"\\(\\(\\)=>{const b=document.querySelector\\('.btn-primary'\\);const c=getComputedStyle\\(b\\);const h=document.querySelector\\('.app-header'\\);const a=document.querySelector\\('.app-auth-link'\\);return JSON.stringify\\({btnBg:c.backgroundColor,btnFg:c.color,header:getComputedStyle\\(h\\).backgroundImage,logout:getComputedStyle\\(a\\).color}\\);}\\)\\(\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./probe --dark --size 1280x420 --shot dark-buttons --eval \"\\(\\(\\)=>{const p=getComputedStyle\\(document.querySelector\\('.btn-primary'\\)\\);const o=getComputedStyle\\(document.querySelectorAll\\('.btn-outline-primary'\\)[0]\\);return JSON.stringify\\({primaryBg:p.backgroundColor,primaryFg:p.color,outlineFg:o.color}\\);}\\)\\(\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./final --dark --size 1280x760 --shot dark-list --click \"Graph\" --shot dark-graph)",
+      "Bash(xargs -r kill)"
+    ]
+  }
+}

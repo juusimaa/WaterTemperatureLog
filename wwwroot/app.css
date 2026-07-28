@@ -25,6 +25,15 @@
     --blue: #3B6485;
     --olive: #7E8A46;
 
+    /* The header band always carries light text, so its gradient needs its own
+       stops rather than --ink/--green: --ink flips to a near-white in dark mode,
+       which would wash the brand out. */
+    --header-from: #1E2A22;
+    --header-via: #3E7A57;
+    --header-to: #234A34;
+    --header-fg: #ffffff;
+    --header-fg-soft: rgba(255, 255, 255, 0.82);
+
     /* Map Bootstrap's theming onto the palette so buttons, links, tables and
        form validation all follow the same colours. */
     --bs-body-bg: var(--paper);
@@ -55,6 +64,10 @@
         --blue: #77ABD2;
         --green: #5AA179;
         --green-deep: #3E7A57;
+
+        --header-from: #0C1710;
+        --header-via: #24543B;
+        --header-to: #143222;
 
         --bs-link-color-rgb: 90, 161, 121;
         --bs-primary-rgb: 62, 122, 87;
@@ -97,6 +110,31 @@ a:hover, .btn-link:hover {
     color: #fff;
     background-color: var(--green-deep);
     border-color: var(--green-deep);
+}
+
+/* Dark mode swaps which green can carry which text: on --paper, white on --green
+   is only 3.1:1 and --green-deep as a foreground is 3.6:1, so both light-mode
+   pairings fall short. Filled buttons rest on the darker green with white text
+   and lift to the lighter green with dark text; outlined buttons take the
+   lighter green, which reads at 6:1. Placed after the rules it overrides — a
+   media query adds no specificity, so source order decides. */
+@media (prefers-color-scheme: dark) {
+    .btn-primary {
+        background-color: var(--green-deep);
+        border-color: var(--green-deep);
+    }
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active,
+    .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+        color: var(--paper);
+        background-color: var(--green);
+        border-color: var(--green);
+    }
+
+    .btn-outline-primary {
+        color: var(--green);
+        border-color: var(--green);
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -144,4 +182,92 @@ h1:focus {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+/* ============================================================================
+   ApexCharts dark mode.
+
+   The chart is built server-side, so it cannot know the visitor's colour
+   preference and always renders with ApexCharts' light theme: dark grey text,
+   near-white gridlines and a white tooltip. Restyling it here keeps the chart
+   in step with the OS preference without a round trip, and switches live when
+   the preference changes.
+
+   !important throughout: ApexCharts injects its own stylesheet at runtime,
+   after this file, and sets the legend label colour as an inline style.
+   ============================================================================ */
+@media (prefers-color-scheme: dark) {
+    /* Title, axis labels and any other SVG text. */
+    .apexcharts-canvas text {
+        fill: var(--ink) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-yaxis-label,
+    .apexcharts-canvas .apexcharts-xaxis-label {
+        fill: var(--ink-soft) !important;
+    }
+
+    /* Legend labels are HTML, not SVG. */
+    .apexcharts-canvas .apexcharts-legend-text {
+        color: var(--ink-soft) !important;
+    }
+
+    /* Gridlines and axis rules ship at #e0e0e0, which glares on a dark page. */
+    .apexcharts-canvas .apexcharts-gridline,
+    .apexcharts-canvas .apexcharts-grid-borders line,
+    .apexcharts-canvas .apexcharts-xaxis line,
+    .apexcharts-canvas .apexcharts-yaxis line {
+        stroke: var(--line) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-xcrosshairs,
+    .apexcharts-canvas .apexcharts-ycrosshairs {
+        stroke: var(--ink-soft) !important;
+    }
+
+    /* Tooltip: the default is a white card, and its text inherits --ink from the
+       body, so the values come out near-white on near-white. */
+    .apexcharts-canvas .apexcharts-tooltip {
+        background: var(--paper-panel) !important;
+        border-color: var(--line) !important;
+        color: var(--ink) !important;
+        box-shadow: var(--shadow-lift) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-tooltip-title {
+        background: var(--paper) !important;
+        border-bottom-color: var(--line) !important;
+        color: var(--ink) !important;
+    }
+
+    /* The date bubble under the x-axis, plus the little arrow that points at it. */
+    .apexcharts-canvas .apexcharts-xaxistooltip,
+    .apexcharts-canvas .apexcharts-yaxistooltip {
+        background: var(--paper-panel) !important;
+        border-color: var(--line) !important;
+        color: var(--ink) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-xaxistooltip-bottom::before {
+        border-bottom-color: var(--line) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-xaxistooltip-bottom::after {
+        border-bottom-color: var(--paper-panel) !important;
+    }
+
+    /* Zoom / pan / export controls and the export menu. */
+    .apexcharts-canvas .apexcharts-toolbar svg {
+        fill: var(--ink-soft) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-menu {
+        background: var(--paper-panel) !important;
+        border-color: var(--line) !important;
+        color: var(--ink) !important;
+    }
+
+    .apexcharts-canvas .apexcharts-menu-item:hover {
+        background: var(--line) !important;
+    }
 }
