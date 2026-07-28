@@ -27,10 +27,21 @@ public class TemperatureReading
     /// Water temperature in degrees Celsius. <see cref="decimal"/> rather than
     /// <see cref="double"/> so a reading like 12.5 is stored and compared exactly.
     /// </summary>
+    /// <remarks>
+    /// Nullable so an unfilled form starts empty rather than at 0.0: this river freezes,
+    /// so 0.0 is a real reading and must not be confused with "not entered yet".
+    /// <see cref="RequiredAttribute"/> is what keeps null out of the store — a
+    /// <see cref="RangeAttribute"/> on its own reports null as valid, so without it an
+    /// untouched form would save. Every stored reading therefore has a value, and code
+    /// that reads one back may treat it as present.
+    /// </remarks>
+    [Required(
+        ErrorMessageResourceType = typeof(AppText),
+        ErrorMessageResourceName = nameof(AppText.ValidationTemperatureRequired))]
     [Range(0.0, 40.0,
         ErrorMessageResourceType = typeof(AppText),
         ErrorMessageResourceName = nameof(AppText.ValidationTemperatureRange))]
-    public decimal Celsius { get; set; }
+    public decimal? Celsius { get; set; }
 
     /// <summary>Optional note (weather, who measured, etc.).</summary>
     [MaxLength(500)]

@@ -119,6 +119,7 @@ public static class AppText
     // requires exactly this shape: a public static string property.
     public static string ValidationDateInFuture => Get();
     public static string ValidationTemperatureRange => Get();
+    public static string ValidationTemperatureRequired => Get();
 
     // Not found / error pages
     public static string NotFoundTitle => Get();

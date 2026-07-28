@@ -36,23 +36,28 @@ else if (_readings.Count == 0)
 }
 else if (_view == View.List)
 {
-    <div class="stats">
-        <div class="stat">
-            <span class="stat-label">@AppText.StatLatest</span>
-            <strong>@_latest.Celsius.ToString("0.0") °C</strong>
-            <span class="text-muted">@_latest.MeasuredOn.ToString("d")</span>
+    @* All three read from _measured, so each is null only when no reading carries a
+       temperature at all — in which case there is no statistic to show. *@
+    @if (_latest is not null && _allTimeMax is not null && _allTimeMin is not null)
+    {
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">@AppText.StatLatest</span>
+                <strong>@Temp(_latest) °C</strong>
+                <span class="text-muted">@_latest.MeasuredOn.ToString("d")</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">@AppText.StatAllTimeHigh</span>
+                <strong>@Temp(_allTimeMax) °C</strong>
+                <span class="text-muted">@_allTimeMax.MeasuredOn.ToString("d")</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">@AppText.StatAllTimeLow</span>
+                <strong>@Temp(_allTimeMin) °C</strong>
+                <span class="text-muted">@_allTimeMin.MeasuredOn.ToString("d")</span>
+            </div>
         </div>
-        <div class="stat">
-            <span class="stat-label">@AppText.StatAllTimeHigh</span>
-            <strong>@_allTimeMax.Celsius.ToString("0.0") °C</strong>
-            <span class="text-muted">@_allTimeMax.MeasuredOn.ToString("d")</span>
-        </div>
-        <div class="stat">
-            <span class="stat-label">@AppText.StatAllTimeLow</span>
-            <strong>@_allTimeMin.Celsius.ToString("0.0") °C</strong>
-            <span class="text-muted">@_allTimeMin.MeasuredOn.ToString("d")</span>
-        </div>
-    </div>
+    }
 
     @* Columns carry cell-* classes so the phone stylesheet can re-flow the same
        markup into one card per reading (see Home.razor.css): a 500px-wide table in
@@ -76,7 +81,7 @@ else if (_view == View.List)
                 {
                     <tr>
                         <td class="cell-date text-nowrap">@r.MeasuredOn.ToString("d")</td>
-                        <td class="cell-temp text-end">@r.Celsius.ToString("0.0")</td>
+                        <td class="cell-temp text-end">@Temp(r)</td>
                         <td class="cell-note">@r.Note</td>
                         <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCell">
                             <td class="cell-by text-nowrap small text-muted" title="@EditedTitle(r)">
@@ -191,18 +196,33 @@ else
     private static readonly string[] YearColors =
         ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"];
 
-    // Latest reading and all-time extremes (list header).
-    private TemperatureReading _latest => _readings!.OrderByDescending(r => r.MeasuredOn).First();
-    private TemperatureReading _allTimeMax => _readings!.OrderByDescending(r => r.Celsius).ThenBy(r => r.MeasuredOn).First();
-    private TemperatureReading _allTimeMin => _readings!.OrderBy(r => r.Celsius).ThenBy(r => r.MeasuredOn).First();
+    /// <summary>
+    /// Readings that carry a temperature. <c>[Required]</c> keeps null out of the store,
+    /// so in practice this is every reading — but the statistics and the chart extremes
+    /// derive from it rather than from <c>_readings</c> so they stay correct by
+    /// construction. Ordering by a nullable sorts null below every real value, which
+    /// would otherwise hand "all-time low" to a reading that has no temperature at all.
+    /// </summary>
+    private IEnumerable<TemperatureReading> _measured => _readings!.Where(r => r.Celsius is not null);
 
-    // Years present in the data, newest first, for the filter dropdown.
+    /// <summary>Formats a reading's temperature, or an em dash if it somehow has none.</summary>
+    private static string Temp(TemperatureReading r) => r.Celsius?.ToString("0.0") ?? "—";
+
+    // Latest reading and all-time extremes (list header). Null only when nothing is measured.
+    private TemperatureReading? _latest => _measured.OrderByDescending(r => r.MeasuredOn).FirstOrDefault();
+    private TemperatureReading? _allTimeMax => _measured.OrderByDescending(r => r.Celsius).ThenBy(r => r.MeasuredOn).FirstOrDefault();
+    private TemperatureReading? _allTimeMin => _measured.OrderBy(r => r.Celsius).ThenBy(r => r.MeasuredOn).FirstOrDefault();
+
+    // Years present in the data, newest first, for the filter dropdown. From _measured so
+    // the list cannot offer a year that would draw an empty chart.
     private IReadOnlyList<int> _years =>
-        _readings!.Select(r => r.MeasuredOn.Year).Distinct().OrderByDescending(y => y).ToList();
+        _measured.Select(r => r.MeasuredOn.Year).Distinct().OrderByDescending(y => y).ToList();
 
     // Chart order (oldest-first, left to right), filtered to the selected year when set.
+    // Built from _measured so its indices line up with the plotted points, which is what
+    // UpdateExtremeMarkers indexes into.
     private List<TemperatureReading> _chartOrder =>
-        _readings!
+        _measured
             .Where(r => _selectedYear is null || r.MeasuredOn.Year == _selectedYear)
             .OrderBy(r => r.MeasuredOn)
             .ToList();
@@ -218,22 +238,22 @@ else
     // Months that occur anywhere in the data, ascending — the shared category axis
     // of the compare mode.
     private IReadOnlyList<int> _months =>
-        _readings!.Select(r => r.MeasuredOn.Month).Distinct().Order().ToList();
+        _measured.Select(r => r.MeasuredOn.Month).Distinct().Order().ToList();
 
     // One bar series per year (ascending, so colour slots stay stable as new years
     // are added): the mean temperature per month. Every year gets a point for every
     // month on the axis, null where it has no readings, so the grouped bars line up.
     private IEnumerable<(int Year, List<ChartPoint> Points)> _yearGroups =>
-        _readings!
+        _measured
             .GroupBy(r => r.MeasuredOn.Year)
             .OrderBy(g => g.Key)
             .Select(g => (g.Key, _months.Select(month =>
             {
-                var inMonth = g.Where(r => r.MeasuredOn.Month == month).ToList();
+                var inMonth = g.Where(r => r.MeasuredOn.Month == month && r.Celsius is not null).ToList();
                 var date = new DateTime(2000, month, 1);
                 return new ChartPoint(date,
                                       date.ToString("MMM", CultureInfo.CurrentCulture),
-                                      inMonth.Count == 0 ? null : Math.Round(inMonth.Average(r => r.Celsius), 1));
+                                      inMonth.Count == 0 ? null : Math.Round(inMonth.Average(r => r.Celsius!.Value), 1));
             }).ToList()));
 
     // Distinct key per view so the chart is rebuilt cleanly when the mode changes.
@@ -361,11 +381,14 @@ else
             return;
         }
 
+        // .Value is safe: _chartOrder yields only readings that carry a temperature.
+        // Comparing the nullables directly would be the trap — every comparison against a
+        // null is false, so a null at index 0 would keep the "hottest" marker pinned there.
         int maxIdx = 0, minIdx = 0;
         for (var i = 1; i < order.Count; i++)
         {
-            if (order[i].Celsius > order[maxIdx].Celsius) maxIdx = i;
-            if (order[i].Celsius < order[minIdx].Celsius) minIdx = i;
+            if (order[i].Celsius!.Value > order[maxIdx].Celsius!.Value) maxIdx = i;
+            if (order[i].Celsius!.Value < order[minIdx].Celsius!.Value) minIdx = i;
         }
 
         var markers = new List<MarkersDiscrete>

@@ -294,6 +294,9 @@
   <data name="ValidationTemperatureRange" xml:space="preserve">
     <value>Temperature must be between 0 and 40 °C.</value>
   </data>
+  <data name="ValidationTemperatureRequired" xml:space="preserve">
+    <value>Enter the temperature.</value>
+  </data>
 
   <!-- Not found / error pages -->
   <data name="NotFoundTitle" xml:space="preserve">

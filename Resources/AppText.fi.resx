@@ -285,6 +285,9 @@
   <data name="ValidationTemperatureRange" xml:space="preserve">
     <value>Lämpötilan tulee olla välillä 0–40 °C.</value>
   </data>
+  <data name="ValidationTemperatureRequired" xml:space="preserve">
+    <value>Syötä lämpötila.</value>
+  </data>
 
   <!-- Not found / error pages -->
   <data name="NotFoundTitle" xml:space="preserve">
