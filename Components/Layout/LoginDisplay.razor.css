@@ -2,7 +2,9 @@
    than the page ink or the green link colour. */
 .app-user {
     color: var(--header-fg-soft);
-    max-width: 16rem;
+    /* Capped so a long address cannot dominate the band, but never wider than the
+       space available — on a phone that cap alone would overflow the viewport. */
+    max-width: min(16rem, 100%);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

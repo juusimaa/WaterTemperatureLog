@@ -47,3 +47,90 @@
     width: auto;
     min-width: 10rem;
 }
+
+/* Stands in for ApexCharts' built-in title, matching its weight and size. Unlike
+   the SVG original it wraps, so the compare-years title stays clear of the
+   toolbar icons on a narrow screen. */
+.chart-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+}
+
+/* ============================================================================
+   Phone layout for the readings table.
+
+   The table is ~500px wide — inside .table-responsive that means the Edit link
+   and the By column sit past the right edge of a phone screen, reachable only by
+   a horizontal swipe most people never discover. Below 640px the same rows are
+   re-flowed into one card each, with the date and temperature on the top line and
+   the edit link as a full-height target on the bottom right.
+   ============================================================================ */
+@media (max-width: 640px) {
+    .readings thead {
+        display: none;
+    }
+
+    .readings, .readings tbody {
+        display: block;
+    }
+
+    .readings tr {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: baseline;
+        gap: 0.2rem 0.75rem;
+        padding: 0.7rem 0.1rem;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .readings td {
+        display: block;
+        border: 0;
+        padding: 0;
+    }
+
+    /* Note and By are often empty; collapsed they would still take a grid row. */
+    .readings td:empty {
+        display: none;
+    }
+
+    .readings .cell-date {
+        font-weight: 600;
+    }
+
+    .readings .cell-temp {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    /* The unit lives in the hidden header row, so the cards have to carry it. */
+    .readings .cell-temp::after {
+        content: " °C";
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--ink-soft);
+    }
+
+    /* Full-width own line under the date/temperature pair. */
+    .readings .cell-note {
+        grid-column: 1 / -1;
+        color: var(--ink-soft);
+    }
+
+    .readings .cell-by {
+        grid-column: 1;
+    }
+
+    .readings .cell-edit {
+        grid-column: 2;
+    }
+
+    /* 44px tap target without a 44px-tall table row: the padding grows the link,
+       and the negative margin keeps it from growing the card. */
+    .readings .cell-edit a {
+        display: inline-block;
+        padding: 0.6rem 0.25rem;
+        margin: -0.6rem -0.25rem;
+    }
+}

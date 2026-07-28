@@ -23,7 +23,25 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./i18n --dark --size 1280x600 --eval \"document.querySelector\\('a.lang-option'\\).getAttribute\\('href'\\)\" --eval \"document.querySelector\\('a.lang-option'\\).click\\(\\)\" --wait 2500 --shot en-after-switch --eval \"JSON.stringify\\({lang:document.documentElement.lang,title:document.title,current:document.querySelector\\('.lang-current'\\)?.textContent}\\)\")",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./i18n --size 1280x560 --shot fi-add-light --fill \"Lämpötila \\(°C\\)=45\" --eval \"document.querySelector\\('form'\\).requestSubmit\\(\\)\" --wait 800 --shot fi-add-validation)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./i18n --size 1280x580 --shot fi-add-light --eval \"\\(\\(\\)=>{const i=document.querySelector\\('input[type=number]'\\);const s=Object.getOwnPropertyDescriptor\\(window.HTMLInputElement.prototype,'value'\\).set;s.call\\(i,'45'\\);i.dispatchEvent\\(new Event\\('change',{bubbles:true}\\)\\);return 'set';}\\)\\(\\)\" --wait 500 --eval \"document.querySelector\\('form'\\).requestSubmit\\(\\)\" --wait 1200 --shot fi-add-validation)",
-      "Bash(grep -rnE '>[A-Z][a-z]+[a-z ,.]{4,}<|\"[A-Z][a-z]+ [a-z]{2,}[^\"]*\"' --include=\"*.razor\" Components/)"
+      "Bash(grep -rnE '>[A-Z][a-z]+[a-z ,.]{4,}<|\"[A-Z][a-z]+ [a-z]{2,}[^\"]*\"' --include=\"*.razor\" Components/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5210/)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots --size 390x844 --shot home-list --click \"Graph\" --shot home-graph --goto http://localhost:5210/add --shot add-form)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots --size 390x844 --click \"Kuvaaja\" --shot home-graph --click \"Vertaa vuosia\" --shot home-compare)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out ./shots --size 390x844 --shot add-form)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots --size 320x700 --shot narrow-list --eval \"JSON.stringify\\({docW: document.documentElement.scrollWidth, winW: window.innerWidth, tableW: document.querySelector\\('table'\\)?.scrollWidth, wrapW: document.querySelector\\('.table-responsive'\\)?.clientWidth}\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots --size 320x700 --eval \"JSON.stringify\\([...document.querySelectorAll\\('body *'\\)].filter\\(e=>e.getBoundingClientRect\\(\\).right>321\\).map\\(e=>e.tagName+'.'+e.className+'@'+Math.round\\(e.getBoundingClientRect\\(\\).right\\)\\).slice\\(0,15\\)\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out ./shots --size 390x844 --eval \"JSON.stringify\\([...document.querySelectorAll\\('input,textarea,button,a.btn,select'\\)].map\\(e=>\\({t:e.tagName+\\(e.type?':'+e.type:''\\),im:e.getAttribute\\('inputmode'\\),h:Math.round\\(e.getBoundingClientRect\\(\\).height\\),fs:getComputedStyle\\(e\\).fontSize}\\)\\)\\)\")",
+      "Bash(pkill -f \"dotnet run --no-build\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots2 --size 390x844 --shot after-list --click \"Kuvaaja\" --shot after-graph --click \"Vertaa vuosia\" --shot after-compare)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5210/)",
+      "Bash(lsof -ti:5210)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots3 --size 320x700 --shot narrow-list)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out ./shots3 --size 390x844 --shot add-form --eval \"JSON.stringify\\([...document.querySelectorAll\\('input:not\\([type=hidden]\\),textarea,button:not\\([style]\\),a.btn'\\)].map\\(e=>e.tagName+':'+Math.round\\(e.getBoundingClientRect\\(\\).height\\)\\)\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out ./shots3 --size 390x844 --eval \"document.querySelector\\('input[type=number]'\\).outerHTML\" --eval \"\\(function\\(\\){var i=document.querySelector\\('input[type=number]'\\);i.focus\\(\\);return JSON.stringify\\({sel:[i.selectionStart,i.selectionEnd],val:i.value}\\);}\\)\\(\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out ./shots3 --size 390x844 --eval \"\\(function\\(\\){var i=document.querySelector\\('input[type=number]'\\);i.focus\\(\\);document.execCommand\\('insertText',false,'18'\\);return 'after typing 18: '+i.value;}\\)\\(\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots3 --size 320x700 --click \"Kuvaaja\" --click \"Vertaa vuosia\" --shot narrow-compare)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs \"http://localhost:5210/edit/2026-07-16\" --out ./shots3 --size 390x844 --shot edit-form)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out ./shots3 --size 1200x900 --shot desktop-list --click \"Kuvaaja\" --shot desktop-graph)"
     ]
   }
 }

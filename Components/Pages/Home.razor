@@ -54,8 +54,11 @@ else if (_view == View.List)
         </div>
     </div>
 
+    @* Columns carry cell-* classes so the phone stylesheet can re-flow the same
+       markup into one card per reading (see Home.razor.css): a 500px-wide table in
+       a horizontal scroller would leave the Edit link off-screen on a phone. *@
     <div class="table-responsive">
-        <table class="table">
+        <table class="table readings">
             <thead>
                 <tr>
                     <th>@AppText.Date</th>
@@ -72,15 +75,15 @@ else if (_view == View.List)
                 @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
                 {
                     <tr>
-                        <td class="text-nowrap">@r.MeasuredOn.ToString("d")</td>
-                        <td class="text-end">@r.Celsius.ToString("0.0")</td>
-                        <td>@r.Note</td>
+                        <td class="cell-date text-nowrap">@r.MeasuredOn.ToString("d")</td>
+                        <td class="cell-temp text-end">@r.Celsius.ToString("0.0")</td>
+                        <td class="cell-note">@r.Note</td>
                         <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCell">
-                            <td class="text-nowrap small text-muted" title="@EditedTitle(r)">
+                            <td class="cell-by text-nowrap small text-muted" title="@EditedTitle(r)">
                                 @(r.LastEditedBy ?? "—")
                             </td>
                         </AuthorizeView>
-                        <td class="text-end">
+                        <td class="cell-edit text-end">
                             <AuthorizeView Roles="@AuthOptions.EditorRole">
                                 <a href="@($"/edit/{r.Id}")">@AppText.Edit</a>
                             </AuthorizeView>
@@ -120,9 +123,14 @@ else
         </label>
     </div>
 
+    @* The heading is HTML rather than ApexCharts' own Title: an SVG title is a
+       single unwrappable line, so the longer compare-years title ran off the edge
+       and under the toolbar icons on a phone. This one wraps. The trade-off is
+       that a chart exported to PNG/SVG no longer carries the title with it. *@
+    <h2 class="chart-title">@_chartTitle</h2>
+
     <ApexChart @key="_chartKey"
                TItem="ChartPoint"
-               Title="@_chartTitle"
                Options="_options">
         @if (_stacked)
         {

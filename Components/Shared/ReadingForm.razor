@@ -9,7 +9,13 @@
 
     <div class="mb-3">
         <label class="form-label">@AppText.FieldTemperature</label>
-        <InputNumber @bind-Value="Model.Celsius" class="form-control" step="0.1" min="0" max="40" />
+        @* Most readings are entered on a phone. inputmode="decimal" asks for the big
+           numeric keypad rather than the full punctuation keyboard type=number gets on
+           iOS. Celsius is a non-nullable decimal, so the field always starts at "0";
+           selecting it on focus means the first keystroke replaces that instead of
+           landing after it. *@
+        <InputNumber @bind-Value="Model.Celsius" class="form-control" step="0.1" min="0" max="40"
+                     inputmode="decimal" onfocus="this.select()" />
         <ValidationMessage For="() => Model.Celsius" />
     </div>
 

@@ -141,6 +141,22 @@ a:hover, .btn-link:hover {
   box-shadow: 0 0 0 0.1rem var(--paper), 0 0 0 0.25rem var(--green);
 }
 
+/* Phone: Bootstrap's controls come out 38px tall, under the 44px both Apple and
+   Google ask for. Most readings are entered outdoors on a phone, so every button
+   and field — including the .btn-sm ones in the duplicate/delete prompts — gets
+   the full target. inline-flex keeps the label centred in the taller box. */
+@media (max-width: 640px) {
+    .btn, .form-control, .form-select {
+        min-height: 44px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
 .content {
     padding-top: 1.1rem;
 }
