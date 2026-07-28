@@ -2,10 +2,12 @@ using System.Text.Json;
 using ApexCharts;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
 using WaterTemperatures.Auth;
 using WaterTemperatures.Components;
 using WaterTemperatures.Data;
+using WaterTemperatures.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,26 @@ else
 // Charting (Blazor-ApexCharts).
 builder.Services.AddApexCharts();
 
+// Finnish/English UI. Finnish is first in SupportedCultures and so the default:
+// the readings are from Torniojoki at Jarhoinen, so the audience is local first.
+// A visitor whose browser asks for English still gets English, and the header's
+// language links override either choice via the culture cookie.
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.SetDefaultCulture(AppText.SupportedCultures[0])
+        .AddSupportedCultures(AppText.SupportedCultures)
+        .AddSupportedUICultures(AppText.SupportedCultures);
+
+    // Cookie first (an explicit choice wins), then Accept-Language. Dropping the
+    // query-string provider keeps ?culture= from being a second, unpersisted way
+    // to switch that the header links would then disagree with.
+    options.RequestCultureProviders =
+    [
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider(),
+    ];
+});
+
 var app = builder.Build();
 
 // Ensure the Cosmos database and container exist before serving requests. Safe to
@@ -84,6 +106,11 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+// Sets CurrentCulture/CurrentUICulture for the request. Must run before components
+// render — and before the Blazor circuit is established, since the circuit captures
+// the culture of the request that created it.
+app.UseRequestLocalization();
+
 // Translate the Easy Auth identity (or the dev fallback) into HttpContext.User before
 // components render, so AuthorizeView and the editor checks see the signed-in user.
 app.UseMiddleware<EasyAuthMiddleware>();
@@ -91,6 +118,41 @@ app.UseMiddleware<EasyAuthMiddleware>();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+// Language switch, hit by the header links as a full page load rather than
+// enhanced navigation: the culture is fixed for the lifetime of a Blazor circuit,
+// so the circuit has to be rebuilt under the new one.
+app.MapGet("/culture", (HttpContext http, string culture, string? redirect) =>
+{
+    if (!AppText.SupportedCultures.Contains(culture))
+    {
+        culture = AppText.SupportedCultures[0];
+    }
+
+    http.Response.Cookies.Append(
+        CookieRequestCultureProvider.DefaultCookieName,
+        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+        new CookieOptions
+        {
+            Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddYears(1),
+            SameSite = SameSiteMode.Lax,
+            // A language preference is not consent-gated, so it survives a
+            // non-essential-cookie policy.
+            IsEssential = true,
+        });
+
+    // Only ever bounce back into this site. A caller-supplied absolute URL — or a
+    // protocol-relative "//host" or backslash variant, both of which count as
+    // relative Uris — would otherwise make this an open redirect.
+    var isLocal = !string.IsNullOrEmpty(redirect)
+        && redirect.StartsWith('/')
+        && !redirect.StartsWith("//")
+        && !redirect.StartsWith("/\\");
+
+    return Results.LocalRedirect(isLocal ? redirect! : "/");
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

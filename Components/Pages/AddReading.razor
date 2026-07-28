@@ -5,9 +5,9 @@
 @inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
 
-<PageTitle>Add a reading — @AppText.AppName</PageTitle>
+<PageTitle>@AppText.AddAReading — @AppText.AppName</PageTitle>
 
-<h1>Add a reading</h1>
+<h1>@AppText.AddAReading</h1>
 
 <AuthorizeView Roles="@AuthOptions.EditorRole">
     <Authorized>
@@ -18,25 +18,25 @@
         else if (_duplicate is not null)
         {
             <div class="alert alert-warning">
-                A reading for <strong>@_duplicate.MeasuredOn.ToString("d")</strong> already
-                exists (@_duplicate.Celsius.ToString("0.0") °C). There is one reading per day.
+                @AppText.DuplicateReadingPrefix <strong>@_duplicate.MeasuredOn.ToString("d")</strong>
+                @AppText.DuplicateReadingSuffix(_duplicate.Celsius.ToString("0.0"))
                 <div class="mt-2">
-                    <a class="btn btn-sm btn-primary" href="@($"/edit/{_duplicate.Id}")">Edit that reading</a>
+                    <a class="btn btn-sm btn-primary" href="@($"/edit/{_duplicate.Id}")">@AppText.EditThatReading</a>
                     <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => _duplicate = null">
-                        Pick another date
+                        @AppText.PickAnotherDate
                     </button>
                 </div>
             </div>
         }
 
-        <ReadingForm Model="_model" SubmitLabel="Save" OnValidSubmit="SaveAsync" />
+        <ReadingForm Model="_model" SubmitLabel="@AppText.Save" OnValidSubmit="SaveAsync" />
     </Authorized>
     <NotAuthorized>
         <div class="alert alert-info">
-            You need to be signed in as an editor to add readings.
-            <a href="/.auth/login/google?post_login_redirect_uri=/add" data-enhance-nav="false">Log in</a>.
+            @AppText.NeedEditorToAdd
+            <a href="/.auth/login/google?post_login_redirect_uri=/add" data-enhance-nav="false">@AppText.LogIn</a>.
         </div>
-        <a class="btn btn-secondary" href="/">Back</a>
+        <a class="btn btn-secondary" href="/">@AppText.Back</a>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -81,7 +81,7 @@
             {
                 // Added and then deleted again while we were saving. Vanishingly rare,
                 // but say so rather than pretending the reading was stored.
-                _error = "That reading could not be saved. Please try again.";
+                _error = AppText.SaveFailed;
             }
             return;
         }

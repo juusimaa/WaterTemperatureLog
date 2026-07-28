@@ -1,0 +1,57 @@
+@using System.Globalization
+@inject NavigationManager Nav
+
+@* Two-language switch for the header band.
+
+   Plain links to the /culture endpoint rather than a <select>: with only two
+   options a toggle is one click instead of two, and it works without JavaScript
+   or an interactive circuit, which matters because this renders during static
+   SSR too.
+
+   data-enhance-nav="false" forces a full page load. The culture is fixed when a
+   Blazor circuit is created, so morphing the DOM would leave the old circuit —
+   and the old language — in place. *@
+
+<nav class="lang" aria-label="@AppText.Language">
+    @foreach (var culture in AppText.SupportedCultures)
+    {
+        var isCurrent = string.Equals(CurrentCulture, culture, StringComparison.OrdinalIgnoreCase);
+
+        @if (isCurrent)
+        {
+            <span class="lang-option lang-current" aria-current="true">@Label(culture)</span>
+        }
+        else
+        {
+            <a class="lang-option"
+               href="@($"/culture?culture={culture}&redirect={Uri.EscapeDataString(RelativeUri)}")"
+               hreflang="@culture"
+               lang="@culture"
+               title="@NativeName(culture)"
+               data-enhance-nav="false">@Label(culture)</a>
+        }
+    }
+</nav>
+
+@code {
+    // The two-letter tag of the culture this request is being rendered in.
+    private static string CurrentCulture => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    // Where to return after switching, so the visitor stays on the page they were on.
+    private string RelativeUri
+    {
+        get
+        {
+            var relative = Nav.ToBaseRelativePath(Nav.Uri);
+            return string.IsNullOrEmpty(relative) ? "/" : "/" + relative;
+        }
+    }
+
+    // Short code for the button face ("FI", "EN").
+    private static string Label(string culture) => culture.ToUpperInvariant();
+
+    // Endonym for the tooltip, so the choice is legible to someone who cannot
+    // read the language currently displayed.
+    private static string NativeName(string culture) =>
+        CultureInfo.GetCultureInfo(culture).NativeName;
+}

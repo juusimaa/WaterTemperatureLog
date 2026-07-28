@@ -5,6 +5,7 @@
         <a class="app-brand" href="/">@AppText.AppName</a>
         <span class="app-subtitle">@AppText.Subtitle</span>
         <div class="app-auth">
+            <LanguageSelector />
             <LoginDisplay />
         </div>
     </header>
@@ -17,7 +18,7 @@
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    @AppText.UnhandledError
+    <a href="." class="reload">@AppText.Reload</a>
     <span class="dismiss">🗙</span>
 </div>

@@ -1,5 +1,9 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Globalization
+
+<!DOCTYPE html>
+@* lang follows the request culture so screen readers and browser translation
+   pick the right language. *@
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 
 <head>
     <meta charset="utf-8" />
@@ -26,7 +30,7 @@
     <link rel="icon" type="image/svg+xml" href="@Assets["favicon.svg"]" />
     <link rel="icon" type="image/png" sizes="64x64" href="@Assets["favicon.png"]" />
     <link rel="apple-touch-icon" sizes="180x180" href="@Assets["apple-touch-icon.png"]" />
-    <title>Water Temperature Log</title>
+    <title>@AppText.AppName</title>
     <HeadOutlet />
 </head>
 

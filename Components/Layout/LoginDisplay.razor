@@ -8,9 +8,9 @@
 <AuthorizeView>
     <Authorized>
         <span class="app-user" title="@context.User.Identity?.Name">@context.User.Identity?.Name</span>
-        <a class="app-auth-link" href="/.auth/logout?post_logout_redirect_uri=/" data-enhance-nav="false">Log out</a>
+        <a class="app-auth-link" href="/.auth/logout?post_logout_redirect_uri=/" data-enhance-nav="false">@AppText.LogOut</a>
     </Authorized>
     <NotAuthorized>
-        <a class="app-auth-link" href="/.auth/login/google?post_login_redirect_uri=/" data-enhance-nav="false">Log in to edit</a>
+        <a class="app-auth-link" href="/.auth/login/google?post_login_redirect_uri=/" data-enhance-nav="false">@AppText.LogInToEdit</a>
     </NotAuthorized>
 </AuthorizeView>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using WaterTemperatures.Resources;
 
 namespace WaterTemperatures.Models;
 
@@ -10,12 +11,24 @@ namespace WaterTemperatures.Models;
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public sealed class NotInFutureAttribute : ValidationAttribute
 {
+    /// <summary>
+    /// Attribute arguments have to be compile-time constants, so the message
+    /// cannot be an <see cref="AppText"/> lookup at the call site. DataAnnotations'
+    /// resource accessor reads the static property on each validation instead,
+    /// which is what makes the message follow the request's language.
+    /// </summary>
+    public NotInFutureAttribute()
+    {
+        ErrorMessageResourceType = typeof(AppText);
+        ErrorMessageResourceName = nameof(AppText.ValidationDateInFuture);
+    }
+
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         if (value is DateOnly date && date > DateOnly.FromDateTime(DateTime.Today))
         {
             return new ValidationResult(
-                ErrorMessage ?? "Date cannot be in the future.",
+                FormatErrorMessage(validationContext.DisplayName),
                 [validationContext.MemberName!]);
         }
 

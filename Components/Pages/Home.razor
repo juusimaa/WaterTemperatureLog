@@ -9,46 +9,46 @@
 
 <div class="toolbar">
     <AuthorizeView Roles="@AuthOptions.EditorRole">
-        <a class="btn btn-primary" href="/add">+ Add measurement</a>
+        <a class="btn btn-primary" href="/add">@AppText.AddMeasurement</a>
     </AuthorizeView>
 
-    <div class="btn-group view-toggle" role="group" aria-label="View toggle">
+    <div class="btn-group view-toggle" role="group" aria-label="@AppText.ViewToggle">
         <button type="button"
                 class="btn @(_view == View.List ? "btn-primary" : "btn-outline-primary")"
                 @onclick="() => _view = View.List">
-            List
+            @AppText.ViewList
         </button>
         <button type="button"
                 class="btn @(_view == View.Graph ? "btn-primary" : "btn-outline-primary")"
                 @onclick="() => _view = View.Graph">
-            Graph
+            @AppText.ViewGraph
         </button>
     </div>
 </div>
 
 @if (_readings is null)
 {
-    <p><em>Loading…</em></p>
+    <p><em>@AppText.Loading</em></p>
 }
 else if (_readings.Count == 0)
 {
-    <p>No readings yet. Be the first to <a href="/add">add one</a>.</p>
+    <p>@AppText.NoReadingsYet <a href="/add">@AppText.AddTheFirstOne</a></p>
 }
 else if (_view == View.List)
 {
     <div class="stats">
         <div class="stat">
-            <span class="stat-label">Latest</span>
+            <span class="stat-label">@AppText.StatLatest</span>
             <strong>@_latest.Celsius.ToString("0.0") °C</strong>
             <span class="text-muted">@_latest.MeasuredOn.ToString("d")</span>
         </div>
         <div class="stat">
-            <span class="stat-label">All-time high</span>
+            <span class="stat-label">@AppText.StatAllTimeHigh</span>
             <strong>@_allTimeMax.Celsius.ToString("0.0") °C</strong>
             <span class="text-muted">@_allTimeMax.MeasuredOn.ToString("d")</span>
         </div>
         <div class="stat">
-            <span class="stat-label">All-time low</span>
+            <span class="stat-label">@AppText.StatAllTimeLow</span>
             <strong>@_allTimeMin.Celsius.ToString("0.0") °C</strong>
             <span class="text-muted">@_allTimeMin.MeasuredOn.ToString("d")</span>
         </div>
@@ -58,12 +58,12 @@ else if (_view == View.List)
         <table class="table">
             <thead>
                 <tr>
-                    <th>Date</th>
+                    <th>@AppText.Date</th>
                     <th class="text-end">°C</th>
-                    <th>Note</th>
+                    <th>@AppText.Note</th>
                     @* Editor emails are shown to editors only, not to public visitors. *@
                     <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCol">
-                        <th>By</th>
+                        <th>@AppText.By</th>
                     </AuthorizeView>
                     <th></th>
                 </tr>
@@ -82,7 +82,7 @@ else if (_view == View.List)
                         </AuthorizeView>
                         <td class="text-end">
                             <AuthorizeView Roles="@AuthOptions.EditorRole">
-                                <a href="@($"/edit/{r.Id}")">Edit</a>
+                                <a href="@($"/edit/{r.Id}")">@AppText.Edit</a>
                             </AuthorizeView>
                         </td>
                     </tr>
@@ -97,21 +97,21 @@ else
         <button type="button"
                 class="btn @(!_stacked && _selectedYear is null ? "btn-primary" : "btn-outline-primary")"
                 @onclick="() => SelectYear(null)">
-            All years
+            @AppText.AllYears
         </button>
 
         <button type="button"
                 class="btn @(_stacked ? "btn-primary" : "btn-outline-primary")"
                 @onclick="ShowStacked">
-            Compare years
+            @AppText.CompareYears
         </button>
 
         <label class="year-select">
-            <span class="visually-hidden">Filter by year</span>
+            <span class="visually-hidden">@AppText.FilterByYear</span>
             <select class="form-select"
                     value="@(!_stacked && _selectedYear is not null ? _selectedYear.ToString() : "")"
                     @onchange="OnYearChanged">
-                <option value="">Select a year…</option>
+                <option value="">@AppText.SelectYear</option>
                 @foreach (var year in _years)
                 {
                     <option value="@year" selected="@(!_stacked && _selectedYear == year)">@year</option>
@@ -142,7 +142,7 @@ else
         {
             <ApexPointSeries TItem="ChartPoint"
                              Items="_linePoints"
-                             Name="Temperature"
+                             Name="@AppText.SeriesTemperature"
                              SeriesType="SeriesType.Line"
                              ShowDataLabels="true"
                              XValue="@(p => p.MeasuredOn)"
@@ -203,7 +203,7 @@ else
     private List<ChartPoint> _linePoints =>
         _chartOrder
             .Select(r => new ChartPoint(r.MeasuredOn.ToDateTime(TimeOnly.MinValue),
-                                        r.MeasuredOn.ToString("MMM", CultureInfo.InvariantCulture),
+                                        r.MeasuredOn.ToString("MMM", CultureInfo.CurrentCulture),
                                         r.Celsius))
             .ToList();
 
@@ -224,7 +224,7 @@ else
                 var inMonth = g.Where(r => r.MeasuredOn.Month == month).ToList();
                 var date = new DateTime(2000, month, 1);
                 return new ChartPoint(date,
-                                      date.ToString("MMM", CultureInfo.InvariantCulture),
+                                      date.ToString("MMM", CultureInfo.CurrentCulture),
                                       inMonth.Count == 0 ? null : Math.Round(inMonth.Average(r => r.Celsius), 1));
             }).ToList()));
 
@@ -232,25 +232,62 @@ else
     private string _chartKey => _stacked ? "stacked" : (_selectedYear?.ToString() ?? "all");
 
     private string _chartTitle =>
-        _stacked ? "Water temperature (°C) — monthly average by year"
-        : _selectedYear is null ? "Water temperature (°C)"
-        : $"Water temperature (°C) — {_selectedYear}";
+        _stacked ? AppText.ChartTitleMonthlyAverage
+        : _selectedYear is null ? AppText.ChartTitle
+        : AppText.ChartTitleForYear(_selectedYear.Value);
 
     private readonly ApexChartOptions<ChartPoint> _options = new()
     {
-        // Deep green (--green-deep) to match the header and button accents.
         Colors = [LineColor],
         Xaxis = new XAxis { Type = XAxisType.Datetime },
         Markers = new Markers { Size = 4 },
         Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
+        // ApexCharts formats the datetime axis and its tooltip client-side, in
+        // English unless it is handed a locale. Feed it the request's culture so
+        // the dates on the chart match the dates in the table.
+        Chart = new Chart { DefaultLocale = "app", Locales = [CurrentChartLocale()] },
     };
+
+    /// <summary>
+    /// The ApexCharts locale for the current request, built from the culture's own
+    /// month and day names so a new UI language needs no extra chart translation.
+    /// </summary>
+    private static ChartLocale CurrentChartLocale()
+    {
+        var f = CultureInfo.CurrentCulture.DateTimeFormat;
+        return new ChartLocale
+        {
+            Name = "app",
+            Options = new LocaleOptions
+            {
+                // Trim the trailing empty 13th month .NET carries for 12-month calendars.
+                Months = [.. f.MonthNames.Where(m => !string.IsNullOrEmpty(m))],
+                ShortMonths = [.. f.AbbreviatedMonthNames.Where(m => !string.IsNullOrEmpty(m))],
+                Days = [.. f.DayNames],
+                ShortDays = [.. f.AbbreviatedDayNames],
+                Toolbar = new LocaleToolbar
+                {
+                    Menu = AppText.ChartMenu,
+                    Pan = AppText.ChartPan,
+                    Reset = AppText.ChartReset,
+                    Selection = AppText.ChartSelection,
+                    SelectionZoom = AppText.ChartSelectionZoom,
+                    ZoomIn = AppText.ChartZoomIn,
+                    ZoomOut = AppText.ChartZoomOut,
+                    ExportToPNG = AppText.ChartExportToPng,
+                    ExportToSVG = AppText.ChartExportToSvg,
+                    ExportToCSV = AppText.ChartExportToCsv,
+                },
+            },
+        };
+    }
 
     // Full provenance for the "By" column, shown on hover.
     private static string EditedTitle(TemperatureReading r) =>
         r.UpdatedAt is null
-            ? $"Added by {r.CreatedBy ?? "unknown"} on {r.CreatedAt.ToLocalTime():g}"
-            : $"Added by {r.CreatedBy ?? "unknown"} on {r.CreatedAt.ToLocalTime():g}; " +
-              $"last edited by {r.UpdatedBy ?? "unknown"} on {r.UpdatedAt.Value.ToLocalTime():g}";
+            ? AppText.AddedByOn(r.CreatedBy ?? AppText.Unknown, r.CreatedAt.ToLocalTime().ToString("g"))
+            : AppText.AddedByOn(r.CreatedBy ?? AppText.Unknown, r.CreatedAt.ToLocalTime().ToString("g")) + "; " +
+              AppText.EditedByOn(r.UpdatedBy ?? AppText.Unknown, r.UpdatedAt.Value.ToLocalTime().ToString("g"));
 
     private void OnYearChanged(ChangeEventArgs e)
     {

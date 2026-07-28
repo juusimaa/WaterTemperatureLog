@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Neutral (fallback) culture: English.
+
+    Finnish lives in AppText.fi.resx and is the default the app serves (see
+    Program.cs); this file is what a visitor gets when their language is neither,
+    and what covers any key Finnish is missing.
+
+    Keys are read through the AppText class, not IStringLocalizer, so the call
+    sites stay AppText.Foo. Sentences that wrap markup around part of the text
+    are split into ...Prefix/...Suffix pairs rather than embedding HTML here.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Branding -->
+  <data name="AppName" xml:space="preserve">
+    <value>Water Temperature Log</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Torniojoki river at Jarhoinen village.</value>
+    <comment>Not composed from RiverName/VillageName: Finnish declines the village name.</comment>
+  </data>
+
+  <!-- Header: language and sign-in -->
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="LogIn" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="LogInToEdit" xml:space="preserve">
+    <value>Log in to edit</value>
+  </data>
+
+  <!-- Home: toolbar and view states -->
+  <data name="AddMeasurement" xml:space="preserve">
+    <value>+ Add measurement</value>
+  </data>
+  <data name="ViewToggle" xml:space="preserve">
+    <value>View toggle</value>
+  </data>
+  <data name="ViewList" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="ViewGraph" xml:space="preserve">
+    <value>Graph</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="NoReadingsYet" xml:space="preserve">
+    <value>No readings yet.</value>
+  </data>
+  <data name="AddTheFirstOne" xml:space="preserve">
+    <value>Add the first one.</value>
+  </data>
+
+  <!-- Home: summary stats -->
+  <data name="StatLatest" xml:space="preserve">
+    <value>Latest</value>
+  </data>
+  <data name="StatAllTimeHigh" xml:space="preserve">
+    <value>All-time high</value>
+  </data>
+  <data name="StatAllTimeLow" xml:space="preserve">
+    <value>All-time low</value>
+  </data>
+
+  <!-- Home: readings table -->
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>By</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="AddedByOn" xml:space="preserve">
+    <value>Added by {0} on {1}</value>
+  </data>
+  <data name="EditedByOn" xml:space="preserve">
+    <value>last edited by {0} on {1}</value>
+  </data>
+
+  <!-- Home: graph filter -->
+  <data name="AllYears" xml:space="preserve">
+    <value>All years</value>
+  </data>
+  <data name="CompareYears" xml:space="preserve">
+    <value>Compare years</value>
+  </data>
+  <data name="SelectYear" xml:space="preserve">
+    <value>Select a year…</value>
+  </data>
+  <data name="FilterByYear" xml:space="preserve">
+    <value>Filter by year</value>
+  </data>
+
+  <!-- Home: chart -->
+  <data name="ChartTitle" xml:space="preserve">
+    <value>Water temperature (°C)</value>
+  </data>
+  <data name="ChartTitleForYear" xml:space="preserve">
+    <value>Water temperature (°C) — {0}</value>
+  </data>
+  <data name="ChartTitleMonthlyAverage" xml:space="preserve">
+    <value>Water temperature (°C) — monthly average by year</value>
+  </data>
+  <data name="SeriesTemperature" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+
+  <!-- Chart toolbar tooltips (ApexCharts) -->
+  <data name="ChartMenu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="ChartPan" xml:space="preserve">
+    <value>Panning</value>
+  </data>
+  <data name="ChartReset" xml:space="preserve">
+    <value>Reset zoom</value>
+  </data>
+  <data name="ChartSelection" xml:space="preserve">
+    <value>Selection</value>
+  </data>
+  <data name="ChartSelectionZoom" xml:space="preserve">
+    <value>Selection zoom</value>
+  </data>
+  <data name="ChartZoomIn" xml:space="preserve">
+    <value>Zoom in</value>
+  </data>
+  <data name="ChartZoomOut" xml:space="preserve">
+    <value>Zoom out</value>
+  </data>
+  <data name="ChartExportToPng" xml:space="preserve">
+    <value>Download PNG</value>
+  </data>
+  <data name="ChartExportToSvg" xml:space="preserve">
+    <value>Download SVG</value>
+  </data>
+  <data name="ChartExportToCsv" xml:space="preserve">
+    <value>Download CSV</value>
+  </data>
+
+  <!-- Add page -->
+  <data name="AddAReading" xml:space="preserve">
+    <value>Add a reading</value>
+  </data>
+  <data name="DuplicateReadingPrefix" xml:space="preserve">
+    <value>A reading for</value>
+    <comment>Followed by the date in bold, then DuplicateReadingSuffix.</comment>
+  </data>
+  <data name="DuplicateReadingSuffix" xml:space="preserve">
+    <value>already exists ({0} °C). There is one reading per day.</value>
+  </data>
+  <data name="EditThatReading" xml:space="preserve">
+    <value>Edit that reading</value>
+  </data>
+  <data name="PickAnotherDate" xml:space="preserve">
+    <value>Pick another date</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>That reading could not be saved. Please try again.</value>
+  </data>
+  <data name="NeedEditorToAdd" xml:space="preserve">
+    <value>You need to be signed in as an editor to add readings.</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+
+  <!-- Edit page -->
+  <data name="EditReading" xml:space="preserve">
+    <value>Edit reading</value>
+  </data>
+  <data name="ReadingNotFound" xml:space="preserve">
+    <value>Reading not found.</value>
+  </data>
+  <data name="DeleteConfirmPrefix" xml:space="preserve">
+    <value>Delete the reading for</value>
+    <comment>Followed by the date in bold, then DeleteConfirmSuffix.</comment>
+  </data>
+  <data name="DeleteConfirmSuffix" xml:space="preserve">
+    <value>({0} °C)?</value>
+  </data>
+  <data name="YesDeleteIt" xml:space="preserve">
+    <value>Yes, delete it</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="NeedEditorToChange" xml:space="preserve">
+    <value>You need to be signed in as an editor to change readings.</value>
+  </data>
+  <data name="UpdateFailedDeleted" xml:space="preserve">
+    <value>This reading was deleted by someone else, so it could not be updated.</value>
+  </data>
+  <data name="AlreadyDeleted" xml:space="preserve">
+    <value>This reading has already been deleted by someone else.</value>
+  </data>
+
+  <!-- Reading form -->
+  <data name="FieldTemperature" xml:space="preserve">
+    <value>Temperature (°C)</value>
+  </data>
+  <data name="FieldNote" xml:space="preserve">
+    <value>Note (optional)</value>
+  </data>
+  <data name="DateIsIdentityHelp" xml:space="preserve">
+    <value>The date identifies the reading and cannot be changed. To move it to another day, delete this reading and add it again.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+
+  <!-- Validation -->
+  <data name="ValidationDateInFuture" xml:space="preserve">
+    <value>Date cannot be in the future.</value>
+  </data>
+  <data name="ValidationTemperatureRange" xml:space="preserve">
+    <value>Temperature must be between 0 and 40 °C.</value>
+  </data>
+
+  <!-- Not found / error pages -->
+  <data name="NotFoundTitle" xml:space="preserve">
+    <value>Not found</value>
+  </data>
+  <data name="NotFoundBody" xml:space="preserve">
+    <value>Sorry, the content you are looking for does not exist.</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Error.</value>
+  </data>
+  <data name="ErrorBody" xml:space="preserve">
+    <value>An error occurred while processing your request.</value>
+  </data>
+  <data name="RequestId" xml:space="preserve">
+    <value>Request ID:</value>
+  </data>
+
+  <!-- Unhandled error banner -->
+  <data name="UnhandledError" xml:space="preserve">
+    <value>An unhandled error has occurred.</value>
+  </data>
+  <data name="Reload" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+
+  <!-- Reconnect modal -->
+  <data name="Rejoining" xml:space="preserve">
+    <value>Rejoining the server…</value>
+  </data>
+  <data name="RejoinRetryPrefix" xml:space="preserve">
+    <value>Rejoin failed… trying again in</value>
+    <comment>Followed by a live seconds counter, then RejoinRetrySuffix.</comment>
+  </data>
+  <data name="RejoinRetrySuffix" xml:space="preserve">
+    <value>seconds.</value>
+  </data>
+  <data name="RejoinFailed" xml:space="preserve">
+    <value>Failed to rejoin.</value>
+  </data>
+  <data name="RetryOrReload" xml:space="preserve">
+    <value>Please retry or reload the page.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="SessionPaused" xml:space="preserve">
+    <value>The session has been paused by the server.</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="ResumeFailed" xml:space="preserve">
+    <value>Failed to resume the session.</value>
+  </data>
+  <data name="PleaseReload" xml:space="preserve">
+    <value>Please reload the page.</value>
+  </data>
+</root>

@@ -5,20 +5,20 @@
 @inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
 
-<PageTitle>Edit reading — @AppText.AppName</PageTitle>
+<PageTitle>@AppText.EditReading — @AppText.AppName</PageTitle>
 
-<h1>Edit reading</h1>
+<h1>@AppText.EditReading</h1>
 
 <AuthorizeView Roles="@AuthOptions.EditorRole">
     <Authorized>
         @if (_loading)
         {
-            <p><em>Loading…</em></p>
+            <p><em>@AppText.Loading</em></p>
         }
         else if (_model is null)
         {
-            <div class="alert alert-warning">Reading not found.</div>
-            <a class="btn btn-secondary" href="/">Back</a>
+            <div class="alert alert-warning">@AppText.ReadingNotFound</div>
+            <a class="btn btn-secondary" href="/">@AppText.Back</a>
         }
         else
         {
@@ -30,44 +30,44 @@
             @if (_confirmingDelete)
             {
                 <div class="alert alert-danger">
-                    Delete the reading for <strong>@_model.MeasuredOn.ToString("d")</strong>
-                    (@_model.Celsius.ToString("0.0") °C)?
+                    @AppText.DeleteConfirmPrefix <strong>@_model.MeasuredOn.ToString("d")</strong>
+                    @AppText.DeleteConfirmSuffix(_model.Celsius.ToString("0.0"))
                     <div class="mt-2">
                         <button type="button" class="btn btn-sm btn-danger" @onclick="DeleteAsync">
-                            Yes, delete it
+                            @AppText.YesDeleteIt
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-secondary"
                                 @onclick="() => _confirmingDelete = false">
-                            Cancel
+                            @AppText.Cancel
                         </button>
                     </div>
                 </div>
             }
 
-            <ReadingForm Model="_model" SubmitLabel="Update" OnValidSubmit="SaveAsync" DateReadOnly="true">
+            <ReadingForm Model="_model" SubmitLabel="@AppText.Update" OnValidSubmit="SaveAsync" DateReadOnly="true">
                 <ExtraButtons>
                     <button type="button" class="btn btn-outline-danger float-end"
                             @onclick="() => _confirmingDelete = true">
-                        Delete
+                        @AppText.Delete
                     </button>
                 </ExtraButtons>
             </ReadingForm>
 
             <p class="text-muted small mt-3">
-                Added by @(_model.CreatedBy ?? "unknown") on @_model.CreatedAt.ToLocalTime().ToString("g")
+                @AppText.AddedByOn(_model.CreatedBy ?? AppText.Unknown, _model.CreatedAt.ToLocalTime().ToString("g"))
                 @if (_model.UpdatedAt is not null)
                 {
-                    <text>&#160;· last edited by @(_model.UpdatedBy ?? "unknown") on @_model.UpdatedAt.Value.ToLocalTime().ToString("g")</text>
+                    <text>&#160;· @AppText.EditedByOn(_model.UpdatedBy ?? AppText.Unknown, _model.UpdatedAt.Value.ToLocalTime().ToString("g"))</text>
                 }
             </p>
         }
     </Authorized>
     <NotAuthorized>
         <div class="alert alert-info">
-            You need to be signed in as an editor to change readings.
-            <a href="@($"/.auth/login/google?post_login_redirect_uri=/edit/{Id}")" data-enhance-nav="false">Log in</a>.
+            @AppText.NeedEditorToChange
+            <a href="@($"/.auth/login/google?post_login_redirect_uri=/edit/{Id}")" data-enhance-nav="false">@AppText.LogIn</a>.
         </div>
-        <a class="btn btn-secondary" href="/">Back</a>
+        <a class="btn btn-secondary" href="/">@AppText.Back</a>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -101,7 +101,7 @@
         // result means someone deleted the reading while it was open.
         if (!await Repository.UpdateAsync(_model))
         {
-            _error = "This reading was deleted by someone else, so it could not be updated.";
+            _error = AppText.UpdateFailedDeleted;
             return;
         }
 
@@ -121,7 +121,7 @@
         // Soft delete: the reading is hidden, not destroyed, so a mis-click is recoverable.
         if (!await Repository.DeleteAsync(Id, editor))
         {
-            _error = "This reading has already been deleted by someone else.";
+            _error = AppText.AlreadyDeleted;
             return;
         }
 

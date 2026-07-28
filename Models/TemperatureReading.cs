@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using WaterTemperatures.Resources;
 
 namespace WaterTemperatures.Models;
 
@@ -19,14 +20,16 @@ public class TemperatureReading
     public string Id => IdFor(MeasuredOn);
 
     /// <summary>The day the measurement was taken (no time component).</summary>
-    [NotInFuture(ErrorMessage = "Date cannot be in the future.")]
+    [NotInFuture]
     public DateOnly MeasuredOn { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     /// <summary>
     /// Water temperature in degrees Celsius. <see cref="decimal"/> rather than
     /// <see cref="double"/> so a reading like 12.5 is stored and compared exactly.
     /// </summary>
-    [Range(0.0, 40.0, ErrorMessage = "Temperature must be between 0 and 40 °C.")]
+    [Range(0.0, 40.0,
+        ErrorMessageResourceType = typeof(AppText),
+        ErrorMessageResourceName = nameof(AppText.ValidationTemperatureRange))]
     public decimal Celsius { get; set; }
 
     /// <summary>Optional note (weather, who measured, etc.).</summary>

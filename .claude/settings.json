@@ -11,7 +11,19 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./probe --dark --size 800x400 --eval \"\\(\\(\\)=>{const b=document.querySelector\\('.btn-primary'\\);const c=getComputedStyle\\(b\\);const h=document.querySelector\\('.app-header'\\);const a=document.querySelector\\('.app-auth-link'\\);return JSON.stringify\\({btnBg:c.backgroundColor,btnFg:c.color,header:getComputedStyle\\(h\\).backgroundImage,logout:getComputedStyle\\(a\\).color}\\);}\\)\\(\\)\")",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./probe --dark --size 1280x420 --shot dark-buttons --eval \"\\(\\(\\)=>{const p=getComputedStyle\\(document.querySelector\\('.btn-primary'\\)\\);const o=getComputedStyle\\(document.querySelectorAll\\('.btn-outline-primary'\\)[0]\\);return JSON.stringify\\({primaryBg:p.backgroundColor,primaryFg:p.color,outlineFg:o.color}\\);}\\)\\(\\)\")",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./final --dark --size 1280x760 --shot dark-list --click \"Graph\" --shot dark-graph)",
-      "Bash(xargs -r kill)"
+      "Bash(xargs -r kill)",
+      "Bash(grep -rn \"RiverName\\\\|VillageName\" --include=\"*.cs\" --include=\"*.razor\" . | grep -v -E \"/\\(bin|obj\\)/\"; echo \"=== ApexCharts locale API ===\"; find ~/.nuget/packages/blazor-apexcharts -name \"*.xml\" 2>/dev/null | head -2)",
+      "Read(//Users/jouniuusimaa/.nuget/packages/blazor-apexcharts/**)",
+      "Bash(curl -s http://localhost:5211/)",
+      "Bash(curl -s -H \"Accept-Language: en-GB,en;q=0.9\" http://localhost:5211/)",
+      "Bash(curl -s -H \"Accept-Language: fi-FI,fi;q=0.9\" http://localhost:5211/)",
+      "Bash(curl -s -H \"Accept-Language: de-DE,de;q=0.9\" http://localhost:5211/)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./i18n --dark --size 1280x820 --shot fi-list --click \"Kuvaaja\" --shot fi-graph --click \"Vertaa vuosia\" --shot fi-compare)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./i18n --dark --size 1280x760 --click \"Kuvaaja\" --eval \"\\(\\(\\)=>{const el=document.querySelector\\('.apexcharts-inner'\\);const r=el.getBoundingClientRect\\(\\);const x=r.left+r.width*0.72,y=r.top+r.height*0.4;for\\(const t of ['mouseenter','mousemove','mousemove']\\){el.dispatchEvent\\(new MouseEvent\\(t,{bubbles:true,clientX:x,clientY:y}\\)\\);}return 'ok';}\\)\\(\\)\" --wait 600 --shot fi-tooltip --click \"EN\" --shot en-after-switch --click \"Graph\" --shot en-graph)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/ --out ./i18n --dark --size 1280x600 --eval \"document.querySelector\\('a.lang-option'\\).getAttribute\\('href'\\)\" --eval \"document.querySelector\\('a.lang-option'\\).click\\(\\)\" --wait 2500 --shot en-after-switch --eval \"JSON.stringify\\({lang:document.documentElement.lang,title:document.title,current:document.querySelector\\('.lang-current'\\)?.textContent}\\)\")",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./i18n --size 1280x560 --shot fi-add-light --fill \"Lämpötila \\(°C\\)=45\" --eval \"document.querySelector\\('form'\\).requestSubmit\\(\\)\" --wait 800 --shot fi-add-validation)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5211/add --out ./i18n --size 1280x580 --shot fi-add-light --eval \"\\(\\(\\)=>{const i=document.querySelector\\('input[type=number]'\\);const s=Object.getOwnPropertyDescriptor\\(window.HTMLInputElement.prototype,'value'\\).set;s.call\\(i,'45'\\);i.dispatchEvent\\(new Event\\('change',{bubbles:true}\\)\\);return 'set';}\\)\\(\\)\" --wait 500 --eval \"document.querySelector\\('form'\\).requestSubmit\\(\\)\" --wait 1200 --shot fi-add-validation)",
+      "Bash(grep -rnE '>[A-Z][a-z]+[a-z ,.]{4,}<|\"[A-Z][a-z]+ [a-z]{2,}[^\"]*\"' --include=\"*.razor\" Components/)"
     ]
   }
 }

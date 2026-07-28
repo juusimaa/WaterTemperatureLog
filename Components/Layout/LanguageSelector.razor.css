@@ -1,0 +1,34 @@
+/* Sits in the coloured header band, so it uses the header foreground rather than
+   the page ink or the green link colour. */
+.lang {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.lang-option {
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+}
+
+/* The inactive language is a link: underlined so it reads as one, since colour
+   alone would not distinguish it from the current language on the band. */
+a.lang-option {
+    color: var(--header-fg-soft);
+    text-decoration: underline;
+}
+
+a.lang-option:hover, a.lang-option:focus {
+    color: var(--header-fg);
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.lang-current {
+    color: var(--header-fg);
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.16);
+}
