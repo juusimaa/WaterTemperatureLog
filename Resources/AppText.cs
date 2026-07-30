@@ -24,8 +24,7 @@ public static class AppText
         new("WaterTemperatures.Resources.AppText", typeof(AppText).Assembly);
 
     // Location. Proper nouns, so they are the same in both languages and stay
-    // constants; Subtitle is a translated sentence rather than a composition of
-    // these, because Finnish declines the village name ("Jarhoisen kylässä").
+    // constants.
     public const string RiverName = "Torniojoki";
     public const string VillageName = "Jarhoinen";
 
@@ -36,7 +35,11 @@ public static class AppText
 
     // Branding
     public static string AppName => Get();
-    public static string Subtitle => Get();
+
+    // Just the two proper nouns, so — unlike AppName — this needs no
+    // translation and stays identical in both languages.
+    public static string Subtitle => $"{RiverName}, {VillageName}";
+
     public static string MetaDescription => Get();
 
     // Header: language and sign-in

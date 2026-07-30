@@ -66,10 +66,7 @@
 
   <!-- Branding -->
   <data name="AppName" xml:space="preserve">
-    <value>Veden lämpötilat</value>
-  </data>
-  <data name="Subtitle" xml:space="preserve">
-    <value>Torniojoki Jarhoisen kylässä.</value>
+    <value>Uimaveden lämpötila</value>
   </data>
   <data name="MetaDescription" xml:space="preserve">
     <value>Torniojoen veden lämpötilaa Jarhoisen kylässä – käsin mitattuna, listattuna ja kuvaajana ajan yli.</value>
