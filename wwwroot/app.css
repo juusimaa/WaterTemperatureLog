@@ -127,15 +127,26 @@ body::before {
             mask-repeat: no-repeat;
 }
 
-/* Phone: the artboard is 1440x900, so on a tall narrow screen `cover` scales to
-   the height and throws away about 70% of the width — the birch clump fills
-   half the screen and the composition is gone. Fitting to the width instead
-   lays the whole landscape out as a strip along the bottom edge. */
+/* Phone gets its own artboard rather than a reframing of the desktop one.
+   1440x900 masked onto a 390x844 screen either scales to the height and throws
+   away most of the width, or fits the width and leaves a thin strip of horizon
+   along the bottom — neither uses the screen. peltoaukea-mobile.svg is the same
+   view recomposed at 480x1040, close enough to a phone's proportions that
+   `cover` crops almost nothing, with the horizon a third of the way down and
+   the field given the room it has in the photograph. */
 @media (max-width: 640px) {
     body::before {
-        -webkit-mask-size: 100% auto;
-                mask-size: 100% auto;
+        -webkit-mask-image: url("img/peltoaukea-mobile.svg");
+                mask-image: url("img/peltoaukea-mobile.svg");
     }
+}
+
+/* Bootstrap paints every cell with `background-color: var(--bs-table-bg)`,
+   which defaults to the body colour — an opaque block over the drawing for the
+   full height of the readings list. The rows carry their own separation from
+   the border rules, so they do not need a fill. */
+.table {
+    --bs-table-bg: transparent;
 }
 
 /* Some people turn background imagery off at the OS level; honour that. */

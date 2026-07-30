@@ -78,7 +78,20 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>5\\)t.remove\\(\\)}\\)' --shot live3-phone)",
       "Bash(git --no-pager diff --stat)",
       "Bash(git --no-pager diff wwwroot/app.css)",
-      "Bash(git --no-pager diff .claude/settings.json)"
+      "Bash(git --no-pager diff .claude/settings.json)",
+      "Bash(python3 gen3.py)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs file://__TRACKED_VAR__/sanity3.html --out . --size 390x850 --shot sanity3)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x1000 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>7\\)t.remove\\(\\)}\\)' --shot fin-light)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --shot fin-phone)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --dark --shot fin-phone-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot fin-phone2)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot fin-phone2-dark)",
+      "Bash(pkill -f \"dotnet run --no-build --no-launch-profile --urls http://localhost:5210\")",
+      "Bash(xargs kill -9)",
+      "Bash(git --no-pager diff --cached --stat)",
+      "Bash(git check-ignore *)",
+      "Bash(git --no-pager log --oneline -3)",
+      "Bash(git --no-pager reflog -5)"
     ]
   }
 }
