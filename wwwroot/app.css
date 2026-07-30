@@ -212,12 +212,35 @@ body::before {
    away most of the width, or fits the width and leaves a thin strip of horizon
    along the bottom — neither uses the screen. peltoaukea-mobile.svg is the same
    view recomposed at 480x1040, close enough to a phone's proportions that
-   `cover` crops almost nothing, with the horizon a third of the way down and
-   the field given the room it has in the photograph. */
+   `cover` crops almost nothing, with the field given the room it has in the
+   photograph. */
 @media (max-width: 640px) {
     body::before {
         -webkit-mask-image: url("img/peltoaukea-mobile.svg");
                 mask-image: url("img/peltoaukea-mobile.svg");
+    }
+}
+
+/* A phone turned sideways is wide, not narrow, so the rule above never fires —
+   it falls through to the tall 1440x900 desktop artwork instead, still anchored
+   bottom center. On a short landscape viewport `cover` scales that image up a
+   lot to fill the width, and the birch clump (the tallest thing in the
+   drawing, reaching ~140px above the horizon at full scale) ends up crowding
+   or clipping under the header band.
+
+   Anchoring top center instead guarantees the header only ever sits over sky:
+   with the image scaled to cover width, the horizon lands at roughly 22% of
+   the viewport height regardless of how wide the phone is (312px of headroom
+   above it, of a 900px-tall source, times the same width-driven scale factor
+   that determines the header's share of the screen) — comfortably below any
+   real header height. Scoped to short + landscape + a phone-ish width so an
+   ordinary short desktop window is untouched. */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+    body::before {
+        -webkit-mask-image: url("img/peltoaukea.svg");
+                mask-image: url("img/peltoaukea.svg");
+        -webkit-mask-position: top center;
+                mask-position: top center;
     }
 }
 

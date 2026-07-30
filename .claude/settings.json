@@ -108,7 +108,21 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x900 --click \"Kuvaaja\" --shot nr-graph)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out . --size 900x760 --shot nr-add)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval \"document.querySelectorAll\\('tbody tr'\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)\" --shot nr-phone)",
-      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x620 --click Kuvaaja --eval 'JSON.stringify\\(getComputedStyle\\(document.querySelector\\('\\\\''.apexcharts-yaxis text'\\\\''\\)\\).fontFamily.slice\\(0,24\\)\\)' --shot nr-graph2)"
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x620 --click Kuvaaja --eval 'JSON.stringify\\(getComputedStyle\\(document.querySelector\\('\\\\''.apexcharts-yaxis text'\\\\''\\)\\).fontFamily.slice\\(0,24\\)\\)' --shot nr-graph2)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 667x375 --shot land-667x375)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --shot land-844x390)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 926x428 --shot land-926x428)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --shot port-390x844)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 667x375 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot land-667x375)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot land-844x390)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 926x428 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot land-926x428)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot port-390x844b)",
+      "Bash(python3 -c ' *)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot fix-port)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 667x375 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-667)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-844)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 926x428 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-926)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-dark)"
     ]
   }
 }
