@@ -64,6 +64,24 @@
     padding: 1.5rem;
 }
 
+/* Sits below .app-main in the flex column, so on a short page (few readings) it
+   still lands at the bottom of the viewport rather than right under the table. */
+.app-footer {
+    display: flex;
+    justify-content: center;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.app-footer p {
+    max-width: 900px;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
 /* Phone layout: the header stacks rather than competing for one line, and the
    content gutters give back the ~16px per side that matters at 320-390px. */
 @media (max-width: 640px) {
@@ -78,6 +96,10 @@
 
     .content {
         padding: 1rem;
+    }
+
+    .app-footer {
+        padding: 0 1rem 1rem;
     }
 }
 

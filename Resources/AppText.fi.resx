@@ -345,4 +345,7 @@
   <data name="PleaseReload" xml:space="preserve">
     <value>Lataa sivu uudelleen.</value>
   </data>
+  <data name="FooterMethodNote" xml:space="preserve">
+    <value>Mittaukset tehdään käsin perinteisellä nestelämpömittarilla. Yksittäistä lukemaa tärkeämpää on mittaustapa – koska jokainen mittaus tehdään samalla tavalla, tulokset ovat keskenään vertailukelpoisia.</value>
+  </data>
 </root>

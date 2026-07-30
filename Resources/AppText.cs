@@ -144,6 +144,9 @@ public static class AppText
     public static string ResumeFailed => Get();
     public static string PleaseReload => Get();
 
+    // Footer
+    public static string FooterMethodNote => Get();
+
     /// <summary>
     /// The resource whose key matches the calling member. Falling back to the key
     /// keeps a missing translation visible in the UI instead of throwing.

@@ -122,7 +122,12 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 667x375 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-667)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-844)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 926x428 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-926)",
-      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-dark)"
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 844x390 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot fix-land-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x1000 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot footer-light)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x1000 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot footer-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot footer-phone)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs 'http://localhost:5210/culture?culture=en&redirect=%2F' --out . --size 1400x1000 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot footer-en)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x700 --eval 'window.scrollTo\\(0,document.body.scrollHeight\\)' --shot footer-longlist)"
     ]
   }
 }

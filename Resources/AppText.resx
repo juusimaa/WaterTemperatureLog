@@ -355,4 +355,7 @@
   <data name="PleaseReload" xml:space="preserve">
     <value>Please reload the page.</value>
   </data>
+  <data name="FooterMethodNote" xml:space="preserve">
+    <value>Readings are taken by hand with a traditional liquid-in-glass thermometer. The exact value matters less than the method — because every reading is taken the same way, they are comparable with each other over time.</value>
+  </data>
 </root>
