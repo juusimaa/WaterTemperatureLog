@@ -29,9 +29,15 @@ public static class AppText
     public const string RiverName = "Torniojoki";
     public const string VillageName = "Jarhoinen";
 
+    // The deployed origin, for tags that need an absolute URL (canonical, Open
+    // Graph). One constant rather than reading the request, since the app has
+    // exactly one production host and social crawlers do not send it anyway.
+    public const string SiteUrl = "https://watertemperatures-jouni.azurewebsites.net";
+
     // Branding
     public static string AppName => Get();
     public static string Subtitle => Get();
+    public static string MetaDescription => Get();
 
     // Header: language and sign-in
     public static string Language => Get();

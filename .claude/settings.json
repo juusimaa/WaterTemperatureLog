@@ -127,7 +127,15 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x1000 --dark --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot footer-dark)",
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>2\\)t.remove\\(\\)}\\)' --shot footer-phone)",
       "Bash(node ~/.claude/tools/shot/shot.mjs 'http://localhost:5210/culture?culture=en&redirect=%2F' --out . --size 1400x1000 --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)' --shot footer-en)",
-      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x700 --eval 'window.scrollTo\\(0,document.body.scrollHeight\\)' --shot footer-longlist)"
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x700 --eval 'window.scrollTo\\(0,document.body.scrollHeight\\)' --shot footer-longlist)",
+      "Bash(find ~/.nuget -iname \"*apexcharts*\" -maxdepth 4 2>/dev/null | head -20 *)",
+      "Read(//Users/jouniuusimaa/.nuget/**)",
+      "Bash(curl -s http://localhost:5210/)",
+      "Bash(curl -s \"http://localhost:5210/culture?culture=en&redirect=%2F\" -c /tmp/cookies.txt)",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:5210/)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1200x800 --click \"Kuvaaja\" --shot chart-light)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1200x800 --dark --click \"Kuvaaja\" --shot chart-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1200x800 --click \"Kuvaaja\" --click \"Vertaa vuosia\" --shot chart-compare)"
     ]
   }
 }

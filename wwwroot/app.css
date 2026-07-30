@@ -401,6 +401,15 @@ h1:focus {
     font-variant-numeric: tabular-nums;
 }
 
+/* The canvas has no background by default, so the fixed Peltoaukea drawing
+   behind the page shows straight through the plot area — fine over prose, too
+   busy behind gridlines and data points. Matching it to --paper (which already
+   flips per theme) opaques just the chart without needing a separate dark-mode
+   rule here. */
+.apexcharts-canvas {
+    background: var(--paper);
+}
+
 @media (prefers-color-scheme: dark) {
     /* Title, axis labels and any other SVG text. */
     .apexcharts-canvas text {

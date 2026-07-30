@@ -78,6 +78,9 @@
     <value>Torniojoki river at Jarhoinen village.</value>
     <comment>Not composed from RiverName/VillageName: Finnish declines the village name.</comment>
   </data>
+  <data name="MetaDescription" xml:space="preserve">
+    <value>Hand-measured water temperature readings from the Torniojoki river at Jarhoinen village, logged and charted over time.</value>
+  </data>
 
   <!-- Header: language and sign-in -->
   <data name="Language" xml:space="preserve">

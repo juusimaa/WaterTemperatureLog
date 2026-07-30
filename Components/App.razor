@@ -8,7 +8,34 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@AppText.MetaDescription" />
     <base href="/" />
+
+    @* Matches --paper in app.css (light/dark). Duplicated as literal hex rather
+       than read from CSS: this drives the browser's own chrome (address bar,
+       task switcher), which needs a value before any stylesheet loads. *@
+    <meta name="theme-color" content="#E9ECE4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#12160F" media="(prefers-color-scheme: dark)" />
+
+    @* One canonical host and one culture-neutral URL: the app has a single production
+       origin, and every page is reachable from "/" (root redirects internally), so
+       there is no per-page canonical to compute here. *@
+    <link rel="canonical" href="@AppText.SiteUrl/" />
+
+    @* Open Graph / Twitter card, so a link shared in Slack, WhatsApp or iMessage
+       shows a title, description and the brand mark instead of a bare URL. *@
+    <meta property="og:site_name" content="@AppText.AppName" />
+    <meta property="og:title" content="@AppText.AppName" />
+    <meta property="og:description" content="@AppText.MetaDescription" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@AppText.SiteUrl/" />
+    <meta property="og:image" content="@($"{AppText.SiteUrl}/{Assets["apple-touch-icon.png"]}")" />
+    <meta property="og:locale" content="@OgLocale" />
+    <meta property="og:locale:alternate" content="@OgLocaleAlternate" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="@AppText.AppName" />
+    <meta name="twitter:description" content="@AppText.MetaDescription" />
+    <meta name="twitter:image" content="@($"{AppText.SiteUrl}/{Assets["apple-touch-icon.png"]}")" />
     <script>
         // Follow the OS light/dark preference automatically (Bootstrap 5.3 color mode).
         // Runs before paint to avoid a flash of the wrong theme.
@@ -53,3 +80,14 @@
 </body>
 
 </html>
+
+@code {
+    // og:locale wants "fi_FI" / "en_US", not the bare two-letter tag this app
+    // otherwise uses everywhere else — only SupportedCultures needs a real
+    // region added if a third language ever joins these two.
+    private static string OgLocale =>
+        CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fi" ? "fi_FI" : "en_US";
+
+    private static string OgLocaleAlternate =>
+        CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fi" ? "en_US" : "fi_FI";
+}

@@ -6,8 +6,12 @@ allow-list of signed-in editors can add, edit, and delete them.
 
 **Live:** https://watertemperatures-jouni.azurewebsites.net
 
-User-facing text and location names live in `Resources/AppText.cs`. Finnish/English
-localization is planned — see that file for the migration path to `.resx` resources.
+The UI is localized into Finnish (default) and English. User-facing text lives in
+`Resources/AppText.resx` / `AppText.fi.resx`, looked up per request through
+`Resources/AppText.cs` from `CultureInfo.CurrentUICulture`. The header's FI/EN
+links post to `/culture`, which sets the culture cookie and does a full page
+reload — the culture is fixed for the lifetime of a Blazor circuit, so switching
+languages can't just morph the DOM.
 
 ## Stack
 
@@ -107,5 +111,9 @@ rm -rf ./publish app.zip
 - `Models/TemperatureReading.cs` — domain model (id/date, °C, note, audit + soft-delete fields).
 - `Data/ITemperatureRepository.cs` — storage contract; `InMemory…` and `Cosmos…` implementations; `SeedData.cs` shared historical rows.
 - `Auth/` — `AuthOptions` (editor allow-list) and `EasyAuthMiddleware` (reads the Easy Auth identity / dev fallback into `HttpContext.User`).
+- `Resources/AppText.cs` + `.resx` / `.fi.resx` — all user-facing text, in Finnish and English.
 - `Components/Pages/` — `Home` (list + graph), `AddReading`, `EditReading`.
-- `Components/Layout/LoginDisplay.razor` — sign-in state and login/logout links.
+- `Components/Layout/` — `MainLayout` (header, footer, page chrome), `LoginDisplay` (sign-in state), `LanguageSelector` (FI/EN switch), `ReconnectModal` (Blazor Server reconnect UI).
+- `wwwroot/app.css` — theme tokens (light/dark palette as CSS custom properties) that the rest of the app's styling reads from.
+- `wwwroot/fonts/` — self-hosted Newsreader (display) and Public Sans (UI) faces, subset to Latin/Latin-ext.
+- `wwwroot/img/` — the Peltoaukea background artwork (desktop and mobile artboards), masked onto the page in `app.css`.
