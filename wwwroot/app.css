@@ -74,10 +74,75 @@
     }
 }
 
+/* The paper colour lives on html alone. body carries the background drawing in
+   a z-index: -1 pseudo-element, and any background on body itself paints
+   straight over it — including Bootstrap reboot's own
+   `body { background-color: var(--bs-body-bg) }`, which is why body is cleared
+   explicitly rather than just left out here. app.css loads after Bootstrap, so
+   this wins. html's colour still propagates to the viewport canvas as before. */
+html {
+    background-color: var(--paper);
+}
+
+body {
+    background-color: transparent;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: var(--paper);
     color: var(--ink);
+}
+
+/* ============================================================================
+   Page background — Peltoaukea.
+
+   The view over the field to the Torniojoki, drawn flat: potato rows at the
+   bottom edge, the mown field, single pines on the near bank, the river, and
+   the unbroken forest line on the far shore.
+
+   Applied as a mask rather than as a background-image. The SVG is monochrome
+   and carries its depth in per-layer opacity, so masking lets --green supply
+   the colour at paint time; one file then serves both themes, where a baked-in
+   palette tuned for the light paper would smear grey over the dark one.
+
+   On the 50% here: the drawing's own layers run between 0.03 and 0.18 alpha,
+   and the mask multiplies, so peak coverage on the page is about 9% — a good
+   deal quieter than the number suggests.
+   ============================================================================ */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--green);
+    opacity: 0.5;
+    -webkit-mask-image: url("img/peltoaukea.svg");
+            mask-image: url("img/peltoaukea.svg");
+    -webkit-mask-size: cover;
+            mask-size: cover;
+    -webkit-mask-position: bottom center;
+            mask-position: bottom center;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+}
+
+/* Phone: the artboard is 1440x900, so on a tall narrow screen `cover` scales to
+   the height and throws away about 70% of the width — the birch clump fills
+   half the screen and the composition is gone. Fitting to the width instead
+   lays the whole landscape out as a strip along the bottom edge. */
+@media (max-width: 640px) {
+    body::before {
+        -webkit-mask-size: 100% auto;
+                mask-size: 100% auto;
+    }
+}
+
+/* Some people turn background imagery off at the OS level; honour that. */
+@media (prefers-reduced-transparency: reduce) {
+    body::before {
+        display: none;
+    }
 }
 
 a, .btn-link {
