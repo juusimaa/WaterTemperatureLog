@@ -91,7 +91,24 @@
       "Bash(git --no-pager diff --cached --stat)",
       "Bash(git check-ignore *)",
       "Bash(git --no-pager log --oneline -3)",
-      "Bash(git --no-pager reflog -5)"
+      "Bash(git --no-pager reflog -5)",
+      "Bash(curl -sS -m 15 -A \"Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(python3 fetch_fonts.py)",
+      "Bash(python3 -c \"import fontTools; print\\('fontTools', fontTools.version\\)\")",
+      "Bash(python3 subset_fonts.py)",
+      "Bash(python3 build_fonts.py)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs file://__TRACKED_VAR__/fonts.html --out . --size 1280x1100 --shot f-top --eval 'document.getElementById\\('\\\\''plex'\\\\''\\).scrollIntoView\\(\\)' --shot f-plex)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs file://__TRACKED_VAR__/fonts.html --out . --size 1280x900 --eval 'document.fonts.ready.then\\(\\(\\)=>0\\), JSON.stringify\\(['\\\\''IBM Plex Sans'\\\\'','\\\\''IBM Plex Mono'\\\\'','\\\\''Source Sans 3'\\\\'','\\\\''Source Serif 4'\\\\'','\\\\''Literata'\\\\'','\\\\''Public Sans'\\\\'','\\\\''Newsreader'\\\\'','\\\\''Atkinson Hyperlegible Next'\\\\''].map\\(f=>f+'\\\\'':'\\\\''+document.fonts.check\\('\\\\''16px \"'\\\\''+f+'\\\\''\"'\\\\''\\)\\)\\)')",
+      "Bash(node ~/.claude/tools/shot/shot.mjs file://__TRACKED_VAR__/fonts.html --out . --size 1200x760 --eval 'document.querySelectorAll\\('\\\\''.masthead,.controls,.closing'\\\\''\\).forEach\\(e=>e.remove\\(\\)\\); document.querySelectorAll\\('\\\\''.face'\\\\''\\).forEach\\(f=>{if\\(!['\\\\''literata'\\\\'','\\\\''newsreader'\\\\''].includes\\(f.id\\)\\)f.remove\\(\\)}\\)' --shot f-pair)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs file://__TRACKED_VAR__/fonts.html --out . --size 1200x520 --eval 'document.querySelectorAll\\('\\\\''.masthead,.controls,.closing'\\\\''\\).forEach\\(e=>e.remove\\(\\)\\); document.querySelectorAll\\('\\\\''.face'\\\\''\\).forEach\\(f=>{if\\(f.id!=='\\\\''literata'\\\\''\\)f.remove\\(\\)}\\); document.querySelector\\('\\\\''.mock'\\\\''\\).remove\\(\\)' --shot f-enc)",
+      "Bash(python3 fetch_ship.py)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x900 --eval 'document.fonts.ready.then\\(\\(\\)=>0\\), JSON.stringify\\({newsreader:document.fonts.check\\('\\\\''600 20px Newsreader'\\\\''\\), publicsans:document.fonts.check\\('\\\\''16px \"Public Sans\"'\\\\''\\), brand:getComputedStyle\\(document.querySelector\\('\\\\''.app-brand'\\\\''\\)\\).fontFamily.slice\\(0,30\\), body:getComputedStyle\\(document.body\\).fontFamily.slice\\(0,30\\)}\\)' --eval 'document.querySelectorAll\\('\\\\''tbody tr'\\\\''\\).forEach\\(\\(t,i\\)=>{if\\(i>6\\)t.remove\\(\\)}\\)' --shot nr-light)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x900 --dark --eval \"document.querySelectorAll\\('tbody tr'\\).forEach\\(\\(t,i\\)=>{if\\(i>6\\)t.remove\\(\\)}\\)\" --shot nr-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1400x900 --click \"Kuvaaja\" --shot nr-graph)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out . --size 900x760 --shot nr-add)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 390x844 --eval \"document.querySelectorAll\\('tbody tr'\\).forEach\\(\\(t,i\\)=>{if\\(i>4\\)t.remove\\(\\)}\\)\" --shot nr-phone)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1000x620 --click Kuvaaja --eval 'JSON.stringify\\(getComputedStyle\\(document.querySelector\\('\\\\''.apexcharts-yaxis text'\\\\''\\)\\).fontFamily.slice\\(0,24\\)\\)' --shot nr-graph2)"
     ]
   }
 }

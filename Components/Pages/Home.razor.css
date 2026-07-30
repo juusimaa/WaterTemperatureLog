@@ -51,9 +51,14 @@
 /* Stands in for ApexCharts' built-in title, matching its weight and size. Unlike
    the SVG original it wraps, so the compare-years title stays clear of the
    toolbar icons on a narrow screen. */
+/* An h2 by markup, but functionally a chart label: it sits directly above
+   ApexCharts' own axis text, so it stays on the interface face rather than
+   picking up the display serif from the global heading rule. */
 .chart-title {
+    font-family: var(--font-ui);
     font-size: 0.9rem;
     font-weight: 700;
+    letter-spacing: 0;
     margin: 0 0 0.5rem;
 }
 
