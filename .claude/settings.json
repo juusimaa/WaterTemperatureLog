@@ -138,7 +138,11 @@
       "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 1200x800 --click \"Kuvaaja\" --click \"Vertaa vuosia\" --shot chart-compare)",
       "Bash(curl -s \"http://localhost:5210/culture?culture=en&redirect=%2F\" -c /tmp/cookies2.txt)",
       "Bash(curl -s -b /tmp/cookies2.txt http://localhost:5210/)",
-      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 900x300 --eval \"document.querySelectorAll\\('tbody tr'\\).forEach\\(\\(t,i\\)=>{if\\(i>1\\)t.remove\\(\\)}\\)\" --shot title-fi)"
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out . --size 900x300 --eval \"document.querySelectorAll\\('tbody tr'\\).forEach\\(\\(t,i\\)=>{if\\(i>1\\)t.remove\\(\\)}\\)\" --shot title-fi)",
+      "Bash(az keyvault *)",
+      "Bash(dotnet user-secrets *)",
+      "Bash(az provider *)",
+      "Bash(az monitor *)"
     ]
   }
 }
