@@ -6,6 +6,10 @@ allow-list of signed-in editors can add, edit, and delete them.
 
 **Live:** https://watertemperatures-jouni.azurewebsites.net
 
+This project also doubles as hands-on **AZ-204** practice — see
+[AZ204-COVERAGE.md](AZ204-COVERAGE.md) for which exam skill areas it currently
+exercises.
+
 The UI is localized into Finnish (default) and English. User-facing text lives in
 `Resources/AppText.resx` / `AppText.fi.resx`, looked up per request through
 `Resources/AppText.cs` from `CultureInfo.CurrentUICulture`. The header's FI/EN
