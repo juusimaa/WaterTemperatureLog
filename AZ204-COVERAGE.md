@@ -47,7 +47,9 @@ weightings below reflect the outline at the time this was written and may drift.
 - **Implement secure, cloud-native apps.** App Service runs with a **system-assigned
   managed identity**. Cosmos DB access uses that identity via Entra ID/RBAC
   (`DefaultAzureCredential` in `Program.cs`) instead of an account-key connection
-  string — the Cosmos account has no key-based auth in use. The Google OAuth client
+  string — the Cosmos account has key-based auth **disabled entirely**
+  (`disableLocalAuth`), so RBAC is the only way in, not just the only way the app
+  happens to use. The Google OAuth client
   secret lives in Key Vault (`kv-watertemperatures`, RBAC-authorization mode) and is
   read via an App Service **Key Vault reference**
   (`@Microsoft.KeyVault(SecretUri=...)`); the managed identity holds the

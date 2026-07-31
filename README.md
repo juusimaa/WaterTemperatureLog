@@ -115,8 +115,10 @@ rm -rf ./publish app.zip
 
 - Resource group `rg-watertemperatures`.
 - Cosmos DB (serverless, NoSQL) `watertemperatures-jouni` in West Europe. Local auth
-  (account keys) is unused — data-plane access is Entra ID/RBAC only, granted to the
-  App Service's managed identity via the **Cosmos DB Built-in Data Contributor** role.
+  (account keys) is **disabled on the account** (`disableLocalAuth`) — the keys still
+  exist but can't authenticate to the data plane at all; access is Entra ID/RBAC only,
+  granted to the App Service's managed identity via the **Cosmos DB Built-in Data
+  Contributor** role.
 - App Service `watertemperatures-jouni` on a Linux **F1 (free)** plan in Sweden Central,
   with WebSockets enabled (for Blazor Server), a system-assigned managed identity, and
   Easy Auth (Google) configured to allow unauthenticated access.
