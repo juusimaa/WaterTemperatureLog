@@ -1,5 +1,6 @@
 using System.Text.Json;
 using ApexCharts;
+using Azure.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Localization;
@@ -22,19 +23,22 @@ builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 
-// Storage: use Cosmos DB when a connection string is configured (production, or a
-// local emulator); otherwise fall back to the in-memory seed data for local dev.
-var cosmosConnectionString = builder.Configuration["Cosmos:ConnectionString"];
+// Storage: use Cosmos DB when an account endpoint is configured (production, or a
+// developer who has opted in locally); otherwise fall back to the in-memory seed
+// data for local dev. Auth to Cosmos is Entra ID (RBAC) via DefaultAzureCredential
+// — no account key anywhere: in Azure it resolves to the App Service's managed
+// identity, locally it falls back to the developer's own `az login` session.
+var cosmosAccountEndpoint = builder.Configuration["Cosmos:AccountEndpoint"];
 var cosmosDatabase = builder.Configuration["Cosmos:Database"] ?? "WaterTemperatures";
 var cosmosContainer = builder.Configuration["Cosmos:Container"] ?? "Readings";
 
-if (string.IsNullOrWhiteSpace(cosmosConnectionString))
+if (string.IsNullOrWhiteSpace(cosmosAccountEndpoint))
 {
     builder.Services.AddSingleton<ITemperatureRepository, InMemoryTemperatureRepository>();
 }
 else
 {
-    builder.Services.AddSingleton(_ => new CosmosClient(cosmosConnectionString, new CosmosClientOptions
+    builder.Services.AddSingleton(_ => new CosmosClient(cosmosAccountEndpoint, new DefaultAzureCredential(), new CosmosClientOptions
     {
         // Use System.Text.Json so DateOnly and the [JsonPropertyName] attributes on the
         // model are honored, and property names stay PascalCase to match the queries.
@@ -46,6 +50,16 @@ else
         var container = sp.GetRequiredService<CosmosClient>().GetContainer(cosmosDatabase, cosmosContainer);
         return new CosmosTemperatureRepository(container);
     });
+}
+
+// Application Insights. Only wired up when a connection string is configured — in
+// Azure it's an App Service setting; unlike Cosmos above, calling
+// AddApplicationInsightsTelemetry() with no connection string throws at startup
+// (the OpenTelemetry exporter it registers requires one), so it isn't safe to call
+// unconditionally the way the Cosmos client is.
+if (!string.IsNullOrWhiteSpace(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+{
+    builder.Services.AddApplicationInsightsTelemetry();
 }
 
 // Charting (Blazor-ApexCharts).
@@ -75,7 +89,7 @@ var app = builder.Build();
 
 // Ensure the Cosmos database and container exist before serving requests. Safe to
 // run every startup; it is a no-op once they exist. Partition key is the item id.
-if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
+if (!string.IsNullOrWhiteSpace(cosmosAccountEndpoint))
 {
     var cosmosClient = app.Services.GetRequiredService<CosmosClient>();
     var database = await cosmosClient.CreateDatabaseIfNotExistsAsync(cosmosDatabase);
