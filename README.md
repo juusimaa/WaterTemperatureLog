@@ -17,10 +17,12 @@ languages can't just morph the DOM.
 
 - **Frontend + backend**: Blazor Web App, Interactive Server render mode (all C#).
 - **Storage**: repository abstraction (`Data/ITemperatureRepository.cs`).
-  - No Cosmos connection string configured → `InMemoryTemperatureRepository` (seeded sample data, lost on restart). This is the default for local dev.
-  - Cosmos connection string configured → `CosmosTemperatureRepository` (Azure Cosmos DB for NoSQL). Selected automatically in `Program.cs`; no UI changes.
-- **Auth**: Azure App Service Easy Auth (Google sign-in) + an editor allow-list.
+  - No Cosmos account endpoint configured → `InMemoryTemperatureRepository` (seeded sample data, lost on restart). This is the default for local dev.
+  - Cosmos account endpoint configured → `CosmosTemperatureRepository` (Azure Cosmos DB for NoSQL). Selected automatically in `Program.cs`; no UI changes. Auth is Entra ID (RBAC) via `DefaultAzureCredential` — no account key anywhere.
+- **Auth**: Azure App Service Easy Auth (Google sign-in) + an editor allow-list. The Google client secret lives in Key Vault, referenced from App Service configuration.
+- **Identity**: App Service has a system-assigned managed identity, granted the Cosmos DB **Built-in Data Contributor** data-plane role and the **Key Vault Secrets User** role.
 - **Hosting**: Azure App Service (Linux, .NET 10).
+- **Monitoring**: Application Insights (workspace-based), wired via `Microsoft.ApplicationInsights.AspNetCore`.
 - **CI/CD**: GitHub Actions — push to `main` builds and deploys automatically.
 
 ## Access control
@@ -50,33 +52,40 @@ dotnet run
 
 Then open the URL shown in the console. Pages: `/` (list + graph), `/add`, `/edit/{id}`.
 
-- **Storage**: with no Cosmos connection string, it uses the in-memory seed data.
+- **Storage**: with no Cosmos account endpoint set, it uses the in-memory seed data.
 - **Auth**: Easy Auth does not run on localhost, so `Auth:DevAutoLoginEmail` in
   `appsettings.Development.json` signs you in as an editor for testing. Comment it out
   to experience the app as an anonymous viewer.
 
 ### Point local runs at Cosmos (optional)
 
-Store the connection string with user-secrets (never commit it):
+Cosmos auth is Entra ID (RBAC), not a key, so there's no secret to store. Set the
+endpoint and sign in with an account that has been granted the Cosmos DB **Built-in
+Data Contributor** role on the account (`az cosmosdb sql role assignment create`):
 
 ```bash
-dotnet user-secrets set "Cosmos:ConnectionString" "<connection-string>"
+dotnet user-secrets set "Cosmos:AccountEndpoint" "https://watertemperatures-jouni.documents.azure.com:443/"
+az login
 ```
 
-On startup the app creates the database/container if missing and seeds the historical
-readings the first time the container is empty.
+`DefaultAzureCredential` picks up the `az login` session locally. On startup the app
+creates the database/container if missing and seeds the historical readings the first
+time the container is empty.
 
 ## Configuration
 
 | Setting | Purpose |
 | --- | --- |
-| `Cosmos:ConnectionString` | Empty → in-memory. Set → use Cosmos. In Azure, set as app setting `Cosmos__ConnectionString`. |
+| `Cosmos:AccountEndpoint` | Empty → in-memory. Set → use Cosmos, authenticating via `DefaultAzureCredential` (managed identity in Azure, `az login` locally). |
 | `Cosmos:Database` / `Cosmos:Container` | Cosmos names (default `WaterTemperatures` / `Readings`). |
 | `Auth:Editors` | Emails allowed to add/edit/delete. |
 | `Auth:DevAutoLoginEmail` | Development only — auto sign-in as this editor locally. |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Azure only. Absent locally → telemetry collection is skipped entirely (not just inert — the package throws at startup if you set this without a valid value). |
 
-Secrets never live in `appsettings.json`: locally use user-secrets, in Azure use App
-Service configuration.
+No secrets live in `appsettings.json` or user-secrets anymore: Cosmos uses managed
+identity/RBAC, and the one remaining secret (the Google OAuth client secret) lives in
+Key Vault, referenced from App Service configuration as
+`@Microsoft.KeyVault(SecretUri=...)`.
 
 ## Deployment
 
@@ -101,10 +110,17 @@ rm -rf ./publish app.zip
 ### Azure resources
 
 - Resource group `rg-watertemperatures`.
-- Cosmos DB (serverless, NoSQL) `watertemperatures-jouni` in West Europe.
+- Cosmos DB (serverless, NoSQL) `watertemperatures-jouni` in West Europe. Local auth
+  (account keys) is unused — data-plane access is Entra ID/RBAC only, granted to the
+  App Service's managed identity via the **Cosmos DB Built-in Data Contributor** role.
 - App Service `watertemperatures-jouni` on a Linux **F1 (free)** plan in Sweden Central,
-  with WebSockets enabled (for Blazor Server) and Easy Auth (Google) configured to
-  allow unauthenticated access.
+  with WebSockets enabled (for Blazor Server), a system-assigned managed identity, and
+  Easy Auth (Google) configured to allow unauthenticated access.
+- Key Vault `kv-watertemperatures` (RBAC authorization mode) holds the Google OAuth
+  client secret. The App Service's managed identity has the **Key Vault Secrets User**
+  role, scoped to the vault.
+- Application Insights `appi-watertemperatures` (workspace-based, backed by Log
+  Analytics workspace `law-watertemperatures`), both in Sweden Central.
 
 ## Project layout
 
