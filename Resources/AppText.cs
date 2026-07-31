@@ -156,6 +156,10 @@ public static class AppText
     // Footer
     public static string FooterMethodNote => Get();
 
+    // No translatable words beyond AppName, so this is composed directly
+    // rather than round-tripped through the resx files.
+    public static string FooterCopyright => $"© {DateTime.UtcNow.Year} Jouni Uusimaa — {AppName}";
+
     /// <summary>
     /// The resource whose key matches the calling member. Falling back to the key
     /// keeps a missing translation visible in the UI instead of throwing.
