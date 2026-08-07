@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ApexCharts;
 using Azure.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
@@ -61,9 +60,6 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["APPLICATIONINSIGHTS_CONNEC
 {
     builder.Services.AddApplicationInsightsTelemetry();
 }
-
-// Charting (Blazor-ApexCharts).
-builder.Services.AddApexCharts();
 
 // Finnish/English UI. Finnish is first in SupportedCultures and so the default:
 // the readings are from Torniojoki at Jarhoinen, so the audience is local first.

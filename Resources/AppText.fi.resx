@@ -143,64 +143,20 @@
     <value>viimeksi muokannut {0} {1}</value>
   </data>
 
-  <!-- Home: graph filter -->
-  <data name="AllYears" xml:space="preserve">
-    <value>Kaikki vuodet</value>
-  </data>
-  <data name="CompareYears" xml:space="preserve">
-    <value>Vertaa vuosia</value>
-  </data>
-  <data name="SelectYear" xml:space="preserve">
-    <value>Valitse vuosi…</value>
-  </data>
-  <data name="FilterByYear" xml:space="preserve">
-    <value>Suodata vuoden mukaan</value>
-  </data>
-
   <!-- Home: chart -->
-  <data name="ChartTitle" xml:space="preserve">
-    <value>Veden lämpötila (°C)</value>
+  <data name="AllReadings" xml:space="preserve">
+    <value>Kaikki mittaukset</value>
   </data>
-  <data name="ChartTitleForYear" xml:space="preserve">
-    <value>Veden lämpötila (°C) — {0}</value>
+  <data name="MonthlyAverages" xml:space="preserve">
+    <value>Kuukausikeskiarvot</value>
   </data>
-  <data name="ChartTitleMonthlyAverage" xml:space="preserve">
-    <value>Veden lämpötila (°C) — kuukausikeskiarvo vuosittain</value>
-  </data>
-  <data name="SeriesTemperature" xml:space="preserve">
-    <value>Lämpötila</value>
+  <data name="ChartHint" xml:space="preserve">
+    <value>Vie hiiri pisteen tai palkin päälle nähdäksesi arvon.</value>
   </data>
 
-  <!-- Chart toolbar tooltips (ApexCharts) -->
-  <data name="ChartMenu" xml:space="preserve">
-    <value>Valikko</value>
-  </data>
-  <data name="ChartPan" xml:space="preserve">
-    <value>Siirrä</value>
-  </data>
-  <data name="ChartReset" xml:space="preserve">
-    <value>Palauta zoomaus</value>
-  </data>
-  <data name="ChartSelection" xml:space="preserve">
-    <value>Valinta</value>
-  </data>
-  <data name="ChartSelectionZoom" xml:space="preserve">
-    <value>Zoomaa valintaan</value>
-  </data>
-  <data name="ChartZoomIn" xml:space="preserve">
-    <value>Lähennä</value>
-  </data>
-  <data name="ChartZoomOut" xml:space="preserve">
-    <value>Loitonna</value>
-  </data>
-  <data name="ChartExportToPng" xml:space="preserve">
-    <value>Lataa PNG</value>
-  </data>
-  <data name="ChartExportToSvg" xml:space="preserve">
-    <value>Lataa SVG</value>
-  </data>
-  <data name="ChartExportToCsv" xml:space="preserve">
-    <value>Lataa CSV</value>
+  <!-- Home: location card -->
+  <data name="LocationLabel" xml:space="preserve">
+    <value>Sijainti</value>
   </data>
 
   <!-- Add page -->

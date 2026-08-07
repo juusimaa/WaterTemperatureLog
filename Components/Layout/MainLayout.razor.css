@@ -4,53 +4,14 @@
     flex-direction: column;
 }
 
-/* Slim top header with a coloured band from the theme palette. */
-.app-header {
-    display: flex;
+.nav {
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.25rem 1rem;
-    padding: 0.9rem 1.5rem;
-    background-image: linear-gradient(90deg, var(--header-from) 0%, var(--header-via) 70%, var(--header-to) 100%);
-    color: var(--header-fg);
-    box-shadow: var(--shadow);
+    row-gap: var(--space-2);
 }
 
-.app-brand {
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--header-fg);
-    text-decoration: none;
+.nav ::deep .tag {
+    white-space: nowrap;
 }
-
-.app-brand:hover {
-    color: var(--header-fg);
-    text-decoration: none;
-}
-
-.app-subtitle {
-    font-size: 0.9rem;
-    color: var(--header-fg-soft);
-}
-
-/* Sign-in state pushed to the right of the header band. Its children set
-   white-space: nowrap, so without min-width: 0 and its own wrap the block cannot
-   shrink below their combined width and pushes the whole page into horizontal
-   scroll on a narrow phone. */
-.app-auth {
-    margin-left: auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.35rem 0.75rem;
-    font-size: 0.9rem;
-    min-width: 0;
-}
-
-/* .app-user and .app-auth-link live in LoginDisplay.razor.css: they belong to a
-   child component, which this component's scoped styles cannot reach. */
 
 .app-main {
     flex: 1;
@@ -60,8 +21,8 @@
 
 .content {
     width: 100%;
-    max-width: 900px;
-    padding: 1.5rem;
+    max-width: 880px;
+    padding: var(--space-4);
 }
 
 /* Sits below .app-main in the flex column, so on a short page (few readings) it
@@ -70,35 +31,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 1.5rem 1.5rem;
+    padding: 0 var(--space-4) var(--space-4);
+}
+
+.app-footer .hr {
+    max-width: 880px;
 }
 
 .app-footer p {
-    max-width: 900px;
+    max-width: 880px;
     margin: 0;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
-    color: var(--ink-soft);
     font-size: 0.85rem;
     line-height: 1.5;
 }
 
 .app-footer-copyright {
     padding-top: 0.5rem;
-    border-top: none;
     font-size: 0.75rem;
 }
 
 /* Phone layout: the header stacks rather than competing for one line, and the
    content gutters give back the ~16px per side that matters at 320-390px. */
 @media (max-width: 640px) {
-    .app-header {
+    .nav {
         padding: 0.75rem 1rem;
-    }
-
-    .app-auth {
-        margin-left: 0;
-        width: 100%;
     }
 
     .content {

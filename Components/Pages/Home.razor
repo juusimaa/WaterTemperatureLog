@@ -1,200 +1,134 @@
 @page "/"
-@using System.Globalization
 @inject ITemperatureRepository Repository
 @rendermode InteractiveServer
 
 <PageTitle>@AppText.AppName</PageTitle>
 
-<h1 class="visually-hidden">@AppText.AppName</h1>
+<div class="wt-wrap">
+    <div style="padding-top: var(--space-6); padding-bottom: var(--space-4);">
+        <h1 style="margin-bottom: var(--space-2);">@AppText.AppName</h1>
+        <p class="text-muted" style="max-width: 56ch;">@AppText.MetaDescription</p>
+    </div>
 
-<div class="toolbar">
     <AuthorizeView Roles="@AuthOptions.EditorRole">
-        <a class="btn btn-primary" href="/add">@AppText.AddMeasurement</a>
+        <div style="margin-bottom: var(--space-4);">
+            <a class="btn btn-primary" href="/add">@AppText.AddMeasurement</a>
+        </div>
     </AuthorizeView>
 
-    <div class="btn-group view-toggle" role="group" aria-label="@AppText.ViewToggle">
-        <button type="button"
-                class="btn @(_view == View.List ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => _view = View.List">
-            @AppText.ViewList
-        </button>
-        <button type="button"
-                class="btn @(_view == View.Graph ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => _view = View.Graph">
-            @AppText.ViewGraph
-        </button>
-    </div>
-</div>
-
-@if (_readings is null)
-{
-    <p><em>@AppText.Loading</em></p>
-}
-else if (_readings.Count == 0)
-{
-    <p>@AppText.NoReadingsYet <a href="/add">@AppText.AddTheFirstOne</a></p>
-}
-else if (_view == View.List)
-{
-    @* All three read from _measured, so each is null only when no reading carries a
-       temperature at all — in which case there is no statistic to show. *@
-    @if (_latest is not null && _allTimeMax is not null && _allTimeMin is not null)
+    @if (_readings is null)
     {
-        <div class="stats">
-            <div class="stat">
-                <span class="stat-label">@AppText.StatLatest</span>
-                <strong>@Temp(_latest) °C</strong>
-                <span class="text-muted">@_latest.MeasuredOn.ToString("d")</span>
+        <p><em>@AppText.Loading</em></p>
+    }
+    else if (_readings.Count == 0)
+    {
+        <p>@AppText.NoReadingsYet <a href="/add">@AppText.AddTheFirstOne</a></p>
+    }
+    else
+    {
+        @* All three read from _measured, so each is null only when no reading carries a
+           temperature at all — in which case there is no statistic to show. *@
+        @if (_latest is not null && _allTimeMax is not null && _allTimeMin is not null)
+        {
+            <div class="wt-stats" style="margin-bottom: var(--space-6);">
+                <div class="card elev-sm">
+                    <div class="card-kicker">@AppText.StatLatest</div>
+                    <div class="card-title" style="font-size: 26px;">@Temp(_latest) °C</div>
+                    <div class="card-meta">@_latest.MeasuredOn.ToString("d")</div>
+                </div>
+                <div class="card elev-sm">
+                    <div class="card-kicker">@AppText.StatAllTimeHigh</div>
+                    <div class="card-title" style="font-size: 26px; color: var(--color-accent-700);">@Temp(_allTimeMax) °C</div>
+                    <div class="card-meta">@_allTimeMax.MeasuredOn.ToString("d")</div>
+                </div>
+                <div class="card elev-sm">
+                    <div class="card-kicker">@AppText.StatAllTimeLow</div>
+                    <div class="card-title" style="font-size: 26px; color: var(--color-accent-2-700);">@Temp(_allTimeMin) °C</div>
+                    <div class="card-meta">@_allTimeMin.MeasuredOn.ToString("d")</div>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-label">@AppText.StatAllTimeHigh</span>
-                <strong>@Temp(_allTimeMax) °C</strong>
-                <span class="text-muted">@_allTimeMax.MeasuredOn.ToString("d")</span>
+        }
+
+        <div class="seg" style="margin-bottom: var(--space-4);">
+            <label class="seg-opt">
+                <input type="radio" name="view" checked="@(_view == View.List)" @onchange="() => _view = View.List">
+                <span>@AppText.ViewList</span>
+            </label>
+            <label class="seg-opt">
+                <input type="radio" name="view" checked="@(_view == View.Chart)" @onchange="() => _view = View.Chart">
+                <span>@AppText.ViewGraph</span>
+            </label>
+        </div>
+
+        <div class="wt-lower" style="margin-bottom: var(--space-4);">
+            <div>
+                @if (_view == View.List)
+                {
+                    @* Columns carry cell-* classes so the phone stylesheet can re-flow the same
+                       markup into one card per reading (see Home.razor.css): a wide table in a
+                       horizontal scroller would leave the Edit link off-screen on a phone. *@
+                    <div class="card elev-sm wt-table-wrap" style="padding: 0;">
+                        <table class="table readings">
+                            <thead>
+                                <tr>
+                                    <th>@AppText.Date</th>
+                                    <th>°C</th>
+                                    <th>@AppText.Note</th>
+                                    @* Editor emails are shown to editors only, not to public visitors. *@
+                                    <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCol">
+                                        <th>@AppText.By</th>
+                                    </AuthorizeView>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
+                                {
+                                    <tr>
+                                        <td class="cell-date">@r.MeasuredOn.ToString("d")</td>
+                                        <td class="cell-temp" style="font-weight: 700;">@Temp(r)</td>
+                                        <td class="cell-note wt-row-note">@r.Note</td>
+                                        <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCell">
+                                            <td class="cell-by wt-row-note" title="@EditedTitle(r)">
+                                                @(r.LastEditedBy ?? "—")
+                                            </td>
+                                        </AuthorizeView>
+                                        <td class="cell-edit">
+                                            <AuthorizeView Roles="@AuthOptions.EditorRole">
+                                                <a href="@($"/edit/{r.Id}")">@AppText.Edit</a>
+                                            </AuthorizeView>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="card elev-sm" style="padding: var(--space-4);">
+                        <TemperatureChart Readings="_measuredList" />
+                    </div>
+                }
             </div>
-            <div class="stat">
-                <span class="stat-label">@AppText.StatAllTimeLow</span>
-                <strong>@Temp(_allTimeMin) °C</strong>
-                <span class="text-muted">@_allTimeMin.MeasuredOn.ToString("d")</span>
+
+            <div class="card elev-sm" style="padding: var(--space-3);">
+                <div class="card-kicker" style="margin-bottom: var(--space-2);">@AppText.LocationLabel</div>
+                <iframe class="wt-map-frame washed" src="@MapSrc" loading="lazy" title="@AppText.Subtitle"></iframe>
+                <div class="card-meta" style="margin-top: var(--space-2);">@AppText.Subtitle</div>
             </div>
         </div>
     }
-
-    @* Columns carry cell-* classes so the phone stylesheet can re-flow the same
-       markup into one card per reading (see Home.razor.css): a 500px-wide table in
-       a horizontal scroller would leave the Edit link off-screen on a phone. *@
-    <div class="table-responsive">
-        <table class="table readings">
-            <thead>
-                <tr>
-                    <th>@AppText.Date</th>
-                    <th class="text-end">°C</th>
-                    <th>@AppText.Note</th>
-                    @* Editor emails are shown to editors only, not to public visitors. *@
-                    <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCol">
-                        <th>@AppText.By</th>
-                    </AuthorizeView>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in _readings.OrderByDescending(r => r.MeasuredOn))
-                {
-                    <tr>
-                        <td class="cell-date text-nowrap">@r.MeasuredOn.ToString("d")</td>
-                        <td class="cell-temp text-end">@Temp(r)</td>
-                        <td class="cell-note">@r.Note</td>
-                        <AuthorizeView Roles="@AuthOptions.EditorRole" Context="editorCell">
-                            <td class="cell-by text-nowrap small text-muted" title="@EditedTitle(r)">
-                                @(r.LastEditedBy ?? "—")
-                            </td>
-                        </AuthorizeView>
-                        <td class="cell-edit text-end">
-                            <AuthorizeView Roles="@AuthOptions.EditorRole">
-                                <a href="@($"/edit/{r.Id}")">@AppText.Edit</a>
-                            </AuthorizeView>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
-else
-{
-    <div class="graph-filter">
-        <button type="button"
-                class="btn @(!_stacked && _selectedYear is null ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => SelectYear(null)">
-            @AppText.AllYears
-        </button>
-
-        <button type="button"
-                class="btn @(_stacked ? "btn-primary" : "btn-outline-primary")"
-                @onclick="ShowStacked">
-            @AppText.CompareYears
-        </button>
-
-        <label class="year-select">
-            <span class="visually-hidden">@AppText.FilterByYear</span>
-            <select class="form-select"
-                    value="@(!_stacked && _selectedYear is not null ? _selectedYear.ToString() : "")"
-                    @onchange="OnYearChanged">
-                <option value="">@AppText.SelectYear</option>
-                @foreach (var year in _years)
-                {
-                    <option value="@year" selected="@(!_stacked && _selectedYear == year)">@year</option>
-                }
-            </select>
-        </label>
-    </div>
-
-    @* The heading is HTML rather than ApexCharts' own Title: an SVG title is a
-       single unwrappable line, so the longer compare-years title ran off the edge
-       and under the toolbar icons on a phone. This one wraps. The trade-off is
-       that a chart exported to PNG/SVG no longer carries the title with it. *@
-    <h2 class="chart-title">@_chartTitle</h2>
-
-    <ApexChart @key="_chartKey"
-               TItem="ChartPoint"
-               Options="_options">
-        @if (_stacked)
-        {
-            @* One bar series per year, grouped by month, so the same part of the
-               season can be compared across years side by side. *@
-            @foreach (var g in _yearGroups)
-            {
-                <ApexPointSeries TItem="ChartPoint"
-                                 Items="g.Points"
-                                 Name="@g.Year.ToString()"
-                                 SeriesType="SeriesType.Bar"
-                                 XValue="@(p => p.Label)"
-                                 YValue="@(p => p.Celsius)" />
-            }
-        }
-        else
-        {
-            <ApexPointSeries TItem="ChartPoint"
-                             Items="_linePoints"
-                             Name="@AppText.SeriesTemperature"
-                             SeriesType="SeriesType.Line"
-                             ShowDataLabels="true"
-                             XValue="@(p => p.MeasuredOn)"
-                             YValue="@(p => p.Celsius)" />
-        }
-    </ApexChart>
-}
+</div>
 
 @code {
-    private enum View { List, Graph }
+    private enum View { List, Chart }
 
     private View _view = View.List;
     private IReadOnlyList<TemperatureReading>? _readings;
 
-    // Graph year filter. null = show every year.
-    private int? _selectedYear;
-
-    // Compare mode: one bar series per year on a shared month axis.
-    private bool _stacked;
-
-    /// <summary>
-    /// A single plotted point. <see cref="Celsius"/> is nullable so a year with no
-    /// readings in a month leaves a gap in compare mode rather than a bar at zero,
-    /// which lets every year carry the full set of month categories and keeps the
-    /// grouped bars aligned with their labels.
-    /// </summary>
-    private sealed record ChartPoint(DateTime MeasuredOn, string Label, decimal? Celsius);
-
-    // The single-series line. The chart is rendered server-side and cannot know
-    // the visitor's colour preference, so this is the mid green (--green) that
-    // clears 3:1 against both the light and the dark page background — unlike
-    // --green-deep, which all but vanishes on the dark one. White data labels sit
-    // on it at 5:1.
-    private const string LineColor = "#3E7A57";
-
-    // Validated categorical palette (dataviz skill, light surface) for the
-    // per-year bars in compare mode. Fixed order — one hue per year, never cycled.
-    private static readonly string[] YearColors =
-        ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"];
+    // Centered on the Tornio River at Jarhoinen village.
+    private const string MapSrc = "https://www.openstreetmap.org/export/embed.html?bbox=23.79%2C66.92%2C23.93%2C66.98&layer=mapnik&marker=66.951%2C23.86";
 
     /// <summary>
     /// Readings that carry a temperature. <c>[Required]</c> keeps null out of the store,
@@ -205,6 +139,10 @@ else
     /// </summary>
     private IEnumerable<TemperatureReading> _measured => _readings!.Where(r => r.Celsius is not null);
 
+    // TemperatureChart takes a list (it indexes/re-enumerates it several times while
+    // building the SVG), rather than the lazy _measured sequence.
+    private List<TemperatureReading> _measuredList => _measured.ToList();
+
     /// <summary>Formats a reading's temperature, or an em dash if it somehow has none.</summary>
     private static string Temp(TemperatureReading r) => r.Celsius?.ToString("0.0") ?? "—";
 
@@ -213,103 +151,6 @@ else
     private TemperatureReading? _allTimeMax => _measured.OrderByDescending(r => r.Celsius).ThenBy(r => r.MeasuredOn).FirstOrDefault();
     private TemperatureReading? _allTimeMin => _measured.OrderBy(r => r.Celsius).ThenBy(r => r.MeasuredOn).FirstOrDefault();
 
-    // Years present in the data, newest first, for the filter dropdown. From _measured so
-    // the list cannot offer a year that would draw an empty chart.
-    private IReadOnlyList<int> _years =>
-        _measured.Select(r => r.MeasuredOn.Year).Distinct().OrderByDescending(y => y).ToList();
-
-    // Chart order (oldest-first, left to right), filtered to the selected year when set.
-    // Built from _measured so its indices line up with the plotted points, which is what
-    // UpdateExtremeMarkers indexes into.
-    private List<TemperatureReading> _chartOrder =>
-        _measured
-            .Where(r => _selectedYear is null || r.MeasuredOn.Year == _selectedYear)
-            .OrderBy(r => r.MeasuredOn)
-            .ToList();
-
-    // The plotted points of the single-line mode, oldest first.
-    private List<ChartPoint> _linePoints =>
-        _chartOrder
-            .Select(r => new ChartPoint(r.MeasuredOn.ToDateTime(TimeOnly.MinValue),
-                                        r.MeasuredOn.ToString("MMM", CultureInfo.CurrentCulture),
-                                        r.Celsius))
-            .ToList();
-
-    // Months that occur anywhere in the data, ascending — the shared category axis
-    // of the compare mode.
-    private IReadOnlyList<int> _months =>
-        _measured.Select(r => r.MeasuredOn.Month).Distinct().Order().ToList();
-
-    // One bar series per year (ascending, so colour slots stay stable as new years
-    // are added): the mean temperature per month. Every year gets a point for every
-    // month on the axis, null where it has no readings, so the grouped bars line up.
-    private IEnumerable<(int Year, List<ChartPoint> Points)> _yearGroups =>
-        _measured
-            .GroupBy(r => r.MeasuredOn.Year)
-            .OrderBy(g => g.Key)
-            .Select(g => (g.Key, _months.Select(month =>
-            {
-                var inMonth = g.Where(r => r.MeasuredOn.Month == month && r.Celsius is not null).ToList();
-                var date = new DateTime(2000, month, 1);
-                return new ChartPoint(date,
-                                      date.ToString("MMM", CultureInfo.CurrentCulture),
-                                      inMonth.Count == 0 ? null : Math.Round(inMonth.Average(r => r.Celsius!.Value), 1));
-            }).ToList()));
-
-    // Distinct key per view so the chart is rebuilt cleanly when the mode changes.
-    private string _chartKey => _stacked ? "stacked" : (_selectedYear?.ToString() ?? "all");
-
-    private string _chartTitle =>
-        _stacked ? AppText.ChartTitleMonthlyAverage
-        : _selectedYear is null ? AppText.ChartTitle
-        : AppText.ChartTitleForYear(_selectedYear.Value);
-
-    private readonly ApexChartOptions<ChartPoint> _options = new()
-    {
-        Colors = [LineColor],
-        Xaxis = new XAxis { Type = XAxisType.Datetime },
-        Markers = new Markers { Size = 4 },
-        Stroke = new Stroke { Curve = Curve.Straight, Width = 2 },
-        // ApexCharts formats the datetime axis and its tooltip client-side, in
-        // English unless it is handed a locale. Feed it the request's culture so
-        // the dates on the chart match the dates in the table.
-        Chart = new Chart { DefaultLocale = "app", Locales = [CurrentChartLocale()] },
-    };
-
-    /// <summary>
-    /// The ApexCharts locale for the current request, built from the culture's own
-    /// month and day names so a new UI language needs no extra chart translation.
-    /// </summary>
-    private static ChartLocale CurrentChartLocale()
-    {
-        var f = CultureInfo.CurrentCulture.DateTimeFormat;
-        return new ChartLocale
-        {
-            Name = "app",
-            Options = new LocaleOptions
-            {
-                // Trim the trailing empty 13th month .NET carries for 12-month calendars.
-                Months = [.. f.MonthNames.Where(m => !string.IsNullOrEmpty(m))],
-                ShortMonths = [.. f.AbbreviatedMonthNames.Where(m => !string.IsNullOrEmpty(m))],
-                Days = [.. f.DayNames],
-                ShortDays = [.. f.AbbreviatedDayNames],
-                Toolbar = new LocaleToolbar
-                {
-                    Menu = AppText.ChartMenu,
-                    Pan = AppText.ChartPan,
-                    Reset = AppText.ChartReset,
-                    Selection = AppText.ChartSelection,
-                    SelectionZoom = AppText.ChartSelectionZoom,
-                    ZoomIn = AppText.ChartZoomIn,
-                    ZoomOut = AppText.ChartZoomOut,
-                    ExportToPNG = AppText.ChartExportToPng,
-                    ExportToSVG = AppText.ChartExportToSvg,
-                    ExportToCSV = AppText.ChartExportToCsv,
-                },
-            },
-        };
-    }
-
     // Full provenance for the "By" column, shown on hover.
     private static string EditedTitle(TemperatureReading r) =>
         r.UpdatedAt is null
@@ -317,107 +158,8 @@ else
             : AppText.AddedByOn(r.CreatedBy ?? AppText.Unknown, r.CreatedAt.ToLocalTime().ToString("g")) + "; " +
               AppText.EditedByOn(r.UpdatedBy ?? AppText.Unknown, r.UpdatedAt.Value.ToLocalTime().ToString("g"));
 
-    private void OnYearChanged(ChangeEventArgs e)
-    {
-        SelectYear(int.TryParse(e.Value?.ToString(), out var year) ? year : null);
-    }
-
-    private void SelectYear(int? year)
-    {
-        _stacked = false;
-        _selectedYear = year;
-        ConfigureChart();
-    }
-
-    private void ShowStacked()
-    {
-        _stacked = true;
-        ConfigureChart();
-    }
-
-    // Reconfigure the shared options object for the current mode. The chart is
-    // rebuilt (see @key) so these take effect on the next render.
-    private void ConfigureChart()
-    {
-        if (_stacked)
-        {
-            _options.Colors = [.. YearColors];
-            _options.Markers!.Discrete = null;
-            _options.DataLabels = new DataLabels { Enabled = false };
-            // One category per month, with a bar per year inside it.
-            _options.Xaxis!.Type = XAxisType.Category;
-            _options.Xaxis.Labels = null;
-            _options.PlotOptions = new PlotOptions
-            {
-                Bar = new PlotOptionsBar { ColumnWidth = "80%", BorderRadius = 3 },
-            };
-            // Bars carry their own fill; a stroke would only add a coloured outline.
-            _options.Stroke!.Show = false;
-            _options.Tooltip = new Tooltip { Shared = true, Intersect = false };
-            _options.Legend = new Legend { Show = true };
-        }
-        else
-        {
-            _options.Colors = [LineColor];
-            _options.Xaxis!.Type = XAxisType.Datetime;
-            _options.Xaxis.Labels = null;
-            _options.PlotOptions = null;
-            _options.Stroke!.Show = true;
-            _options.Tooltip = null;
-            _options.Legend = new Legend { Show = false };
-            UpdateExtremeMarkers();
-        }
-    }
-
-    // Highlight the hottest and coldest points of the currently displayed data
-    // with larger, coloured markers (red = high, blue = low) and always-on labels.
-    private void UpdateExtremeMarkers()
-    {
-        var order = _chartOrder;
-        if (order.Count == 0)
-        {
-            _options.Markers!.Discrete = null;
-            _options.DataLabels = new DataLabels { Enabled = false };
-            return;
-        }
-
-        // .Value is safe: _chartOrder yields only readings that carry a temperature.
-        // Comparing the nullables directly would be the trap — every comparison against a
-        // null is false, so a null at index 0 would keep the "hottest" marker pinned there.
-        int maxIdx = 0, minIdx = 0;
-        for (var i = 1; i < order.Count; i++)
-        {
-            if (order[i].Celsius!.Value > order[maxIdx].Celsius!.Value) maxIdx = i;
-            if (order[i].Celsius!.Value < order[minIdx].Celsius!.Value) minIdx = i;
-        }
-
-        var markers = new List<MarkersDiscrete>
-        {
-            new() { SeriesIndex = 0, DataPointIndex = maxIdx, FillColor = "#B23B32", StrokeColor = "#ffffff", Size = 7 },
-        };
-        if (minIdx != maxIdx)
-        {
-            markers.Add(new() { SeriesIndex = 0, DataPointIndex = minIdx, FillColor = "#3B6485", StrokeColor = "#ffffff", Size = 7 });
-        }
-
-        _options.Markers!.Discrete = markers;
-
-        // Show a permanent value label on the min/max points only; every other
-        // point returns an empty string, which ApexCharts skips (no stray pill).
-        // A filled background pill keeps the white text readable in light or dark.
-        _options.DataLabels = new DataLabels
-        {
-            Enabled = true,
-            OffsetY = -10,
-            Style = new DataLabelsStyle { FontSize = "12px", FontWeight = "700" },
-            Background = new DataLabelsBackground { Enabled = true, ForeColor = "#ffffff", BorderWidth = 0 },
-            Formatter = $"function(val, opts) {{ return (opts.dataPointIndex === {maxIdx} || opts.dataPointIndex === {minIdx}) ? val + '°C' : ''; }}",
-        };
-    }
-
     protected override async Task OnInitializedAsync()
     {
         _readings = await Repository.GetRecentAsync(1000);
-        ConfigureChart();
     }
 }

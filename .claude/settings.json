@@ -142,7 +142,29 @@
       "Bash(az keyvault *)",
       "Bash(dotnet user-secrets *)",
       "Bash(az provider *)",
-      "Bash(az monitor *)"
+      "Bash(az monitor *)",
+      "WebFetch(domain:claude.ai)",
+      "Bash(python3)",
+      "Bash(ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS=\"http://localhost:5259\" nohup dotnet run --no-build)",
+      "Bash(disown)",
+      "Bash(curl -s -o /tmp/watertemp-home.html -w \"%{http_code}\\\\n\" http://localhost:5251/)",
+      "Bash(curl -s -o /dev/null -w \"app.css -> %{http_code}\\\\n\" http://localhost:5251/app.css)",
+      "Bash(curl -s -o /dev/null -w \"caprasimo -> %{http_code}\\\\n\" http://localhost:5251/fonts/caprasimo-latin.woff2)",
+      "Bash(curl -s -o /dev/null -w \"figtree -> %{http_code}\\\\n\" http://localhost:5251/fonts/figtree-latin.woff2)",
+      "Bash(pkill -f \"dotnet.*WaterTemperatures\")",
+      "Bash(lsof -ti:5251 -ti:5210)",
+      "Bash(ASPNETCORE_ENVIRONMENT=Development Cosmos__ConnectionString='' nohup dotnet run --no-build --no-launch-profile --urls http://localhost:5210)",
+      "Bash(curl -s -o /dev/null -w \"status: %{http_code}\\\\n\" http://localhost:5210/)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --shot home-list --click Kuvaaja --wait 500 --shot home-chart-all --click Kuukausikeskiarvot --wait 500 --shot home-chart-monthly)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --click Kuvaaja --wait 1500 --shot home-chart-retry)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --eval 'document.querySelectorAll\\('\\\\''input[name=view]'\\\\''\\).length' --eval '[...document.querySelectorAll\\('\\\\''input[name=view]'\\\\''\\)].map\\(e=>\\({checked:e.checked, outer:e.outerHTML}\\)\\)')",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --eval '\\(async \\(\\) => { document.querySelectorAll\\('\\\\''input[name=view]'\\\\''\\)[1].click\\(\\); await new Promise\\(r=>setTimeout\\(r,2000\\)\\); return { hasSvg: !!document.querySelector\\('\\\\''svg'\\\\''\\), checked1: document.querySelectorAll\\('\\\\''input[name=view]'\\\\''\\)[1].checked }; }\\)\\(\\)')",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --eval 'document.querySelectorAll\\('\\\\''input[name=view]'\\\\''\\)[1].click\\(\\)' --wait 1500 --shot home-chart-all --eval 'document.querySelectorAll\\('\\\\''input[name=chartMode]'\\\\''\\)[1].click\\(\\)' --wait 1500 --shot home-chart-monthly)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x1100 --shot home-fixed)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x1100 --dark --shot home-dark)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/add --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 900x700 --shot add-page)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs 'http://localhost:5210/culture?culture=en&redirect=/' --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 1200x900 --shot home-en)",
+      "Bash(node ~/.claude/tools/shot/shot.mjs http://localhost:5210/ --out /private/tmp/claude-501/-Users-jouniuusimaa-Downloads-WaterTemperatures/1778a303-d406-4996-93a7-ff0cf1553650/scratchpad/shots --size 390x844 --shot home-mobile)"
     ]
   }
 }

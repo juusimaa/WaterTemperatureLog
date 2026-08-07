@@ -19,11 +19,11 @@
 
         @if (isCurrent)
         {
-            <span class="lang-option lang-current" aria-current="true">@Label(culture)</span>
+            <span class="wt-lang-btn" aria-current="true">@Label(culture)</span>
         }
         else
         {
-            <a class="lang-option"
+            <a class="wt-lang-btn"
                href="@($"/culture?culture={culture}&redirect={Uri.EscapeDataString(RelativeUri)}")"
                hreflang="@culture"
                lang="@culture"

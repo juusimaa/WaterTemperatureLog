@@ -20,9 +20,9 @@
             <div class="alert alert-warning">
                 @AppText.DuplicateReadingPrefix <strong>@_duplicate.MeasuredOn.ToString("d")</strong>
                 @AppText.DuplicateReadingSuffix(_duplicate.Celsius?.ToString("0.0") ?? "—")
-                <div class="mt-2">
-                    <a class="btn btn-sm btn-primary" href="@($"/edit/{_duplicate.Id}")">@AppText.EditThatReading</a>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => _duplicate = null">
+                <div style="margin-top: var(--space-2);">
+                    <a class="btn btn-primary" href="@($"/edit/{_duplicate.Id}")">@AppText.EditThatReading</a>
+                    <button type="button" class="btn btn-secondary" @onclick="() => _duplicate = null">
                         @AppText.PickAnotherDate
                     </button>
                 </div>

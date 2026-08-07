@@ -1,14 +1,12 @@
 @inherits LayoutComponentBase
 
 <div class="page">
-    <header class="app-header">
-        <a class="app-brand" href="/">@AppText.AppName</a>
-        <span class="app-subtitle">@AppText.Subtitle</span>
-        <div class="app-auth">
-            <LanguageSelector />
-            <LoginDisplay />
-        </div>
-    </header>
+    <nav class="nav">
+        <a class="nav-brand" href="/">@AppText.AppName</a>
+        <span class="tag tag-accent-2" style="margin-right: auto;">@AppText.Subtitle</span>
+        <LoginDisplay />
+        <LanguageSelector />
+    </nav>
 
     <main class="app-main">
         <article class="content">
@@ -17,8 +15,9 @@
     </main>
 
     <footer class="app-footer">
-        <p>@AppText.FooterMethodNote</p>
-        <p class="app-footer-copyright">@AppText.FooterCopyright</p>
+        <div class="hr" style="width: 100%;"></div>
+        <p class="text-muted app-footer-note">@AppText.FooterMethodNote</p>
+        <p class="text-muted app-footer-copyright">@AppText.FooterCopyright</p>
     </footer>
 </div>
 

@@ -11,11 +11,11 @@
     <meta name="description" content="@AppText.MetaDescription" />
     <base href="/" />
 
-    @* Matches --paper in app.css (light/dark). Duplicated as literal hex rather
-       than read from CSS: this drives the browser's own chrome (address bar,
-       task switcher), which needs a value before any stylesheet loads. *@
-    <meta name="theme-color" content="#E9ECE4" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#12160F" media="(prefers-color-scheme: dark)" />
+    @* Matches --color-bg in app.css (light/dark). Duplicated as literal hex
+       rather than read from CSS: this drives the browser's own chrome (address
+       bar, task switcher), which needs a value before any stylesheet loads. *@
+    <meta name="theme-color" content="#f5ead8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#201c16" media="(prefers-color-scheme: dark)" />
 
     @* One canonical host and one culture-neutral URL: the app has a single production
        origin, and every page is reachable from "/" (root redirects internally), so
@@ -36,19 +36,7 @@
     <meta name="twitter:title" content="@AppText.AppName" />
     <meta name="twitter:description" content="@AppText.MetaDescription" />
     <meta name="twitter:image" content="@($"{AppText.SiteUrl}/{Assets["apple-touch-icon.png"]}")" />
-    <script>
-        // Follow the OS light/dark preference automatically (Bootstrap 5.3 color mode).
-        // Runs before paint to avoid a flash of the wrong theme.
-        window.applyColorMode = function () {
-            var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
-        };
-        window.applyColorMode();
-        window.matchMedia('(prefers-color-scheme: dark)')
-            .addEventListener('change', window.applyColorMode);
-    </script>
     <ResourcePreloader />
-    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["WaterTemperatures.styles.css"]" />
     <ImportMap />
@@ -65,12 +53,6 @@
     <Routes />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script>
-        // Enhanced navigation/reload morphs the server HTML (which has no
-        // data-bs-theme) into the DOM and strips the attribute. Re-apply after
-        // each enhanced load so the theme survives reloads and navigations.
-        Blazor.addEventListener('enhancedload', window.applyColorMode);
-    </script>
 
     @* GoatCounter page-view stats. Counts once per full page load; enhanced
        navigation between routes does not re-trigger it. count.js ignores

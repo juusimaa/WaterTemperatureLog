@@ -1,75 +1,49 @@
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
+/* MainLayout's .content already constrains width and supplies the page gutter
+   (see MainLayout.razor.css) — .wt-wrap here is just the design's naming for
+   the page body, not a second wrapper. */
+
+.wt-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
 }
 
-.view-toggle {
-    margin-left: auto;
+.wt-lower {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-3);
+    align-items: start;
 }
 
-.stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 2rem;
-    margin-bottom: 1.25rem;
+@media (max-width: 720px) {
+    .wt-stats { grid-template-columns: 1fr 1fr; }
+    .wt-lower { grid-template-columns: 1fr; }
 }
 
-.stat {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.3;
+@media (max-width: 460px) {
+    .wt-stats { grid-template-columns: 1fr; }
 }
 
-.stat-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--ink-soft);
-}
+.wt-table-wrap { overflow-x: auto; }
 
-.stat strong {
-    font-size: 1.25rem;
-}
+.wt-row-note { color: color-mix(in srgb, var(--color-text) 55%, transparent); font-size: 13px; }
 
-.graph-filter {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.year-select .form-select {
-    width: auto;
-    min-width: 10rem;
-}
-
-/* Stands in for ApexCharts' built-in title, matching its weight and size. Unlike
-   the SVG original it wraps, so the compare-years title stays clear of the
-   toolbar icons on a narrow screen. */
-/* An h2 by markup, but functionally a chart label: it sits directly above
-   ApexCharts' own axis text, so it stays on the interface face rather than
-   picking up the display serif from the global heading rule. */
-.chart-title {
-    font-family: var(--font-ui);
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    margin: 0 0 0.5rem;
+.wt-map-frame {
+    border: 0;
+    width: 100%;
+    height: 220px;
+    border-radius: var(--radius-md);
+    display: block;
 }
 
 /* ============================================================================
    Phone layout for the readings table.
 
-   The table is ~500px wide — inside .table-responsive that means the Edit link
-   and the By column sit past the right edge of a phone screen, reachable only by
-   a horizontal swipe most people never discover. Below 640px the same rows are
-   re-flowed into one card each, with the date and temperature on the top line and
-   the edit link as a full-height target on the bottom right.
+   The table is wide — inside .wt-table-wrap that means the Edit link and the
+   By column sit past the right edge of a phone screen, reachable only by a
+   horizontal swipe most people never discover. Below 640px the same rows are
+   re-flowed into one card each, with the date and temperature on the top line
+   and the edit link as a full-height target on the bottom right.
    ============================================================================ */
 @media (max-width: 640px) {
     .readings thead {
@@ -85,8 +59,8 @@
         grid-template-columns: 1fr auto;
         align-items: baseline;
         gap: 0.2rem 0.75rem;
-        padding: 0.7rem 0.1rem;
-        border-bottom: 1px solid var(--line);
+        padding: 0.7rem var(--space-3);
+        border-bottom: 1px solid var(--color-divider);
     }
 
     .readings td {
@@ -114,13 +88,12 @@
         content: " °C";
         font-size: 0.8rem;
         font-weight: 400;
-        color: var(--ink-soft);
+        color: color-mix(in srgb, var(--color-text) 55%, transparent);
     }
 
     /* Full-width own line under the date/temperature pair. */
     .readings .cell-note {
         grid-column: 1 / -1;
-        color: var(--ink-soft);
     }
 
     .readings .cell-by {

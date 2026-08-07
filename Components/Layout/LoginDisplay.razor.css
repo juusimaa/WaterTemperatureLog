@@ -1,21 +1,10 @@
-/* Sits inside the coloured header band, so it uses the header foreground rather
-   than the page ink or the green link colour. */
 .app-user {
-    color: var(--header-fg-soft);
-    /* Capped so a long address cannot dominate the band, but never wider than the
+    font-size: 13px;
+    color: var(--color-text);
+    /* Capped so a long address cannot dominate the nav, but never wider than the
        space available — on a phone that cap alone would overflow the viewport. */
     max-width: min(16rem, 100%);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.app-auth-link {
-    color: var(--header-fg);
-    text-decoration: underline;
-    white-space: nowrap;
-}
-
-.app-auth-link:hover {
-    color: var(--header-fg);
 }

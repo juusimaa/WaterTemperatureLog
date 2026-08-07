@@ -1,0 +1,269 @@
+@using System.Globalization
+@using WaterTemperatures.Models
+
+@* Hand-drawn SVG chart in two modes: every reading as a line, or monthly
+   averages as bars grouped by year. Ported from the Claude Design mockup —
+   no charting library, no JavaScript; hover state is a plain server round
+   trip like the rest of the app. *@
+
+<div class="seg" style="margin-bottom: var(--space-4);">
+    <label class="seg-opt">
+        <input type="radio" name="chartMode" checked="@(_mode == Mode.All)" @onchange="() => SetMode(Mode.All)">
+        <span>@AppText.AllReadings</span>
+    </label>
+    <label class="seg-opt">
+        <input type="radio" name="chartMode" checked="@(_mode == Mode.Monthly)" @onchange="() => SetMode(Mode.Monthly)">
+        <span>@AppText.MonthlyAverages</span>
+    </label>
+</div>
+
+@if (_mode == Mode.All)
+{
+    <div style="position: relative;">
+        <svg viewBox="0 0 720 300" style="width: 100%; height: auto; display: block; overflow: visible;">
+            @foreach (var g in GridLines)
+            {
+                <line x1="@Inv(g.X1)" y1="@Inv(g.Y)" x2="@Inv(g.X2)" y2="@Inv(g.Y)" stroke="var(--color-divider)" stroke-width="1" />
+            }
+            <path d="@AllPath" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            @foreach (var pt in AllPoints)
+            {
+                <circle class="wt-dot" cx="@Inv(pt.Cx)" cy="@Inv(pt.Cy)" r="3" fill="var(--color-accent)" stroke="var(--color-bg)" stroke-width="1.5"
+                        @onmouseenter="() => SetHover(pt.Label, pt.Cx, pt.Cy)" @onmouseleave="ClearHover"></circle>
+            }
+        </svg>
+        @foreach (var g in GridLines)
+        {
+            <div class="wt-axis-label" style="left: @(Inv(g.LeftPct))%; top: @(Inv(g.TopPct))%;">@g.Label</div>
+        }
+        @foreach (var yt in YearTicks)
+        {
+            <div class="wt-axis-label wt-axis-label-center" style="left: @(Inv(yt.LeftPct))%; top: @(Inv(yt.TopPct))%;">@yt.Label</div>
+        }
+        @if (_hover is not null)
+        {
+            <div class="wt-tooltip" style="left: @(Inv(_hover.LeftPct))%; top: @(Inv(_hover.TopPct))%;">@_hover.Label</div>
+        }
+    </div>
+}
+else
+{
+    <div style="position: relative;">
+        <svg viewBox="0 0 720 300" style="width: 100%; height: auto; display: block; overflow: visible;">
+            @foreach (var g in GridLines)
+            {
+                <line x1="@Inv(g.X1)" y1="@Inv(g.Y)" x2="@Inv(g.X2)" y2="@Inv(g.Y)" stroke="var(--color-divider)" stroke-width="1" />
+            }
+            @foreach (var b in MonthBars)
+            {
+                <rect x="@Inv(b.X)" y="@Inv(b.Y)" width="@Inv(b.Width)" height="@Inv(b.Height)" rx="4" fill="@b.Color"
+                      @onmouseenter="() => SetHover(b.Label, b.Cx, b.Y)" @onmouseleave="ClearHover"></rect>
+            }
+        </svg>
+        @foreach (var g in GridLines)
+        {
+            <div class="wt-axis-label" style="left: @(Inv(g.LeftPct))%; top: @(Inv(g.TopPct))%;">@g.Label</div>
+        }
+        @foreach (var m in MonthTicks)
+        {
+            <div class="wt-axis-label wt-axis-label-center" style="left: @(Inv(m.LeftPct))%; top: @(Inv(m.TopPct))%;">@m.Label</div>
+        }
+        @if (_hover is not null)
+        {
+            <div class="wt-tooltip" style="left: @(Inv(_hover.LeftPct))%; top: @(Inv(_hover.TopPct))%;">@_hover.Label</div>
+        }
+    </div>
+    <div class="wt-legend">
+        @foreach (var yl in YearLegend)
+        {
+            <div class="wt-legend-item"><span class="wt-legend-swatch" style="background: @yl.Color;"></span>@yl.Year</div>
+        }
+    </div>
+}
+
+<div class="card-meta" style="margin-top: var(--space-3);">@AppText.ChartHint</div>
+
+@code {
+    /// <summary>Readings to plot. Every item must carry a temperature.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<TemperatureReading> Readings { get; set; } = [];
+
+    private enum Mode { All, Monthly }
+
+    private Mode _mode = Mode.All;
+    private HoverInfo? _hover;
+
+    private sealed record HoverInfo(string Label, double LeftPct, double TopPct);
+    private sealed record GridLine(double Y, int X1, int X2, string Label, double LeftPct, double TopPct);
+    private sealed record Point(double Cx, double Cy, string Label);
+    private sealed record Tick(double LeftPct, double TopPct, string Label);
+    private sealed record Bar(double X, double Y, double Width, double Height, string Color, string Label, double Cx);
+    private sealed record LegendEntry(int Year, string Color);
+
+    // Chart geometry — a fixed 720x300 viewBox, same as the design.
+    private const double MinT = 5, MaxT = 27;
+    private const int PlotLeft = 40, PlotRight = 700, PlotTop = 16, PlotBottom = 260;
+
+    // Fixed, ordered palette for year-over-year bars — muted for the oldest
+    // year present, most vivid for the newest, cycling if more years ever
+    // accumulate than the palette has slots for.
+    private static readonly string[] YearColors =
+        ["#c0b6a5", "#ccdbb2", "#8fa073", "#ffc6a5", "#d67f48", "#8c491a", "#56633f", "#402310"];
+
+    private static readonly int[] MonthNums = [5, 6, 7, 8];
+
+    private static double YForTemp(double t) => PlotBottom - ((t - MinT) / (MaxT - MinT)) * (PlotBottom - PlotTop);
+
+    // SVG/CSS numbers must use '.' regardless of the request's UI culture —
+    // unlike every other formatted value in this app, these are markup, not
+    // display text, and a Finnish comma would break the attribute.
+    private static string Inv(double d) => d.ToString("0.###", CultureInfo.InvariantCulture);
+
+    private void SetMode(Mode mode)
+    {
+        _mode = mode;
+        _hover = null;
+    }
+
+    private void SetHover(string label, double cx, double cy) =>
+        _hover = new HoverInfo(label, cx / 720 * 100, cy / 300 * 100);
+
+    private void ClearHover() => _hover = null;
+
+    private List<GridLine> GridLines =>
+        [.. new[] { 10, 15, 20, 25 }.Select(v =>
+        {
+            var y = YForTemp(v);
+            return new GridLine(y, PlotLeft, PlotRight, $"{v}°",
+                (PlotLeft - 26) / 720.0 * 100, y / 300.0 * 100);
+        })];
+
+    private List<TemperatureReading> OrderedAll => [.. Readings.OrderBy(r => r.MeasuredOn)];
+
+    private List<Point> AllPoints
+    {
+        get
+        {
+            var ordered = OrderedAll;
+            if (ordered.Count == 0)
+            {
+                return [];
+            }
+
+            var minDay = ordered[0].MeasuredOn.DayNumber;
+            var maxDay = ordered[^1].MeasuredOn.DayNumber;
+            var span = maxDay - minDay;
+
+            double XForDay(int day) => span == 0 ? PlotLeft : PlotLeft + (day - minDay) / (double)span * (PlotRight - PlotLeft);
+
+            return [.. ordered.Select(r =>
+            {
+                var cx = XForDay(r.MeasuredOn.DayNumber);
+                var cy = YForTemp((double)r.Celsius!.Value);
+                var label = $"{r.MeasuredOn.ToString("d", CultureInfo.CurrentCulture)} · {r.Celsius:0.0} °C";
+                return new Point(cx, cy, label);
+            })];
+        }
+    }
+
+    private string AllPath
+    {
+        get
+        {
+            var points = AllPoints;
+            return string.Join(" ", points.Select((p, i) => $"{(i == 0 ? "M" : "L")} {Inv(p.Cx)} {Inv(p.Cy)}"));
+        }
+    }
+
+    private List<Tick> YearTicks
+    {
+        get
+        {
+            var ordered = OrderedAll;
+            if (ordered.Count == 0)
+            {
+                return [];
+            }
+
+            var minDay = ordered[0].MeasuredOn.DayNumber;
+            var maxDay = ordered[^1].MeasuredOn.DayNumber;
+            var span = maxDay - minDay;
+            double XForDay(int day) => span == 0 ? PlotLeft : PlotLeft + (day - minDay) / (double)span * (PlotRight - PlotLeft);
+
+            return [.. ordered.Select(r => r.MeasuredOn.Year).Distinct().Order().Select(year =>
+            {
+                var first = ordered.First(r => r.MeasuredOn.Year == year);
+                return new Tick(XForDay(first.MeasuredOn.DayNumber) / 720.0 * 100, (PlotBottom + 12) / 300.0 * 100, year.ToString());
+            })];
+        }
+    }
+
+    // All distinct years across every reading, ascending — the stable index
+    // that keeps each year's bar color the same as more years are added.
+    private List<int> YearsAscending => [.. Readings.Select(r => r.MeasuredOn.Year).Distinct().Order()];
+
+    private string YearColor(int year)
+    {
+        var index = YearsAscending.IndexOf(year);
+        return YearColors[index % YearColors.Length];
+    }
+
+    // Short month labels, derived from the request culture like the rest of
+    // the app's date formatting rather than a hardcoded translation table.
+    private static string MonthLabel(int monthNum)
+    {
+        var abbrev = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedMonthNames[monthNum - 1].TrimEnd('.');
+        return abbrev.Length == 0 ? abbrev : char.ToUpper(abbrev[0], CultureInfo.CurrentCulture) + abbrev[1..];
+    }
+
+    private List<Bar> MonthBars
+    {
+        get
+        {
+            var yearsPresent = YearsAscending;
+            var slot = (PlotRight - PlotLeft) / (double)MonthNums.Length;
+            var groupWidth = slot * 0.82;
+            var bars = new List<Bar>();
+
+            for (var i = 0; i < MonthNums.Length; i++)
+            {
+                var mNum = MonthNums[i];
+                var byYear = Readings
+                    .Where(r => r.MeasuredOn.Month == mNum)
+                    .GroupBy(r => r.MeasuredOn.Year)
+                    .ToDictionary(g => g.Key, g => g.Select(r => (double)r.Celsius!.Value).ToList());
+
+                var yearsHere = yearsPresent.Where(byYear.ContainsKey).ToList();
+                var count = yearsHere.Count;
+                if (count == 0)
+                {
+                    continue;
+                }
+
+                var groupCenter = PlotLeft + slot * (i + 0.5);
+                var barWidth = Math.Min(groupWidth / count - 3, 20);
+                var totalWidth = count * barWidth + (count - 1) * 3;
+                var startX = groupCenter - totalWidth / 2;
+                var monthLabel = MonthLabel(mNum);
+
+                for (var j = 0; j < yearsHere.Count; j++)
+                {
+                    var year = yearsHere[j];
+                    var avg = byYear[year].Average();
+                    var x = startX + j * (barWidth + 3);
+                    var y = YForTemp(avg);
+                    var label = $"{year} {monthLabel}: {avg.ToString("0.0", CultureInfo.CurrentCulture)} °C";
+                    bars.Add(new Bar(x, y, barWidth, PlotBottom - y, YearColor(year), label, x + barWidth / 2));
+                }
+            }
+
+            return bars;
+        }
+    }
+
+    private List<Tick> MonthTicks =>
+        [.. MonthNums.Select((mNum, i) =>
+            new Tick((PlotLeft + (PlotRight - PlotLeft) / (double)MonthNums.Length * (i + 0.5)) / 720.0 * 100,
+                (PlotBottom + 12) / 300.0 * 100, MonthLabel(mNum)))];
+
+    private List<LegendEntry> YearLegend => [.. YearsAscending.Select(y => new LegendEntry(y, YearColor(y)))];
+}

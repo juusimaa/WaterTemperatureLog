@@ -1,34 +1,27 @@
-/* Sits in the coloured header band, so it uses the header foreground rather than
-   the page ink or the green link colour. */
 .lang {
     display: flex;
     align-items: baseline;
-    gap: 0.35rem;
-    font-size: 0.85rem;
-    white-space: nowrap;
+    gap: 2px;
 }
 
-.lang-option {
-    padding: 0.1rem 0.35rem;
-    border-radius: 0.25rem;
-    letter-spacing: 0.04em;
+.wt-lang-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
     text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 999px;
 }
 
-/* The inactive language is a link: underlined so it reads as one, since colour
-   alone would not distinguish it from the current language on the band. */
-a.lang-option {
-    color: var(--header-fg-soft);
-    text-decoration: underline;
+a.wt-lang-btn:hover {
+    background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
 
-a.lang-option:hover, a.lang-option:focus {
-    color: var(--header-fg);
-    background-color: rgba(255, 255, 255, 0.16);
-}
-
-.lang-current {
-    color: var(--header-fg);
+.wt-lang-btn[aria-current='true'] {
+    background: var(--color-accent-100);
+    color: var(--color-accent-800);
     font-weight: 700;
-    background-color: rgba(255, 255, 255, 0.16);
 }

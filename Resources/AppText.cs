@@ -71,29 +71,13 @@ public static class AppText
     public static string AddedByOn(string editor, string when) => Format(nameof(AddedByOn), editor, when);
     public static string EditedByOn(string editor, string when) => Format(nameof(EditedByOn), editor, when);
 
-    // Home: graph filter
-    public static string AllYears => Get();
-    public static string CompareYears => Get();
-    public static string SelectYear => Get();
-    public static string FilterByYear => Get();
-
     // Home: chart
-    public static string ChartTitle => Get();
-    public static string ChartTitleForYear(int year) => Format(nameof(ChartTitleForYear), year);
-    public static string ChartTitleMonthlyAverage => Get();
-    public static string SeriesTemperature => Get();
+    public static string AllReadings => Get();
+    public static string MonthlyAverages => Get();
+    public static string ChartHint => Get();
 
-    // Chart toolbar tooltips (ApexCharts)
-    public static string ChartMenu => Get();
-    public static string ChartPan => Get();
-    public static string ChartReset => Get();
-    public static string ChartSelection => Get();
-    public static string ChartSelectionZoom => Get();
-    public static string ChartZoomIn => Get();
-    public static string ChartZoomOut => Get();
-    public static string ChartExportToPng => Get();
-    public static string ChartExportToSvg => Get();
-    public static string ChartExportToCsv => Get();
+    // Home: location card
+    public static string LocationLabel => Get();
 
     // Add page
     public static string AddAReading => Get();
